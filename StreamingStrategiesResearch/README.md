@@ -4,7 +4,15 @@
 
 This research folder contains comprehensive analysis and strategies for successful streaming, with a focus on profitable approaches, platform selection, audience growth, and content optimization.
 
+## Quick Start
+
+- **[📊 Executive Summary](./00-Executive-Summary.md)** - High-level strategic overview with key findings, metrics, and recommendations
+- **[📖 Comprehensive Summary](./COMPREHENSIVE-SUMMARY.md)** - Complete guide with highlights from all research documents, quick reference sections, and navigation links
+
 ## Research Areas
+
+### 0. [Executive Summary](./00-Executive-Summary.md)
+High-level strategic overview, key findings, market opportunities, and expected outcomes.
 
 ### 1. [Platform Analysis](./01-Platform-Analysis.md)
 Analysis of streaming platforms, their revenue potential, audience reach, and competitive advantages.
