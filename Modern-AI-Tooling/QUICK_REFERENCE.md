@@ -34,6 +34,8 @@
 
 ## Cost Comparison (Approximate Monthly)
 
+**Note**: Pricing is approximate and subject to change. Always verify current pricing on provider websites. Last updated: December 2024.
+
 ### Chat Models (API)
 - GPT-4 Turbo: ~$0.01 per 1K input tokens
 - Claude 3.5 Sonnet: ~$0.003 per 1K input tokens

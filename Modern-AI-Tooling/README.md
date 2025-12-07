@@ -218,6 +218,8 @@ Investigation into modern AI tooling, best practices, ranked models, and related
 
 ### 7. Embeddings & Vector Search
 
+**What are Embeddings?** Embeddings are numerical representations of text that capture semantic meaning, allowing computers to understand similarity between content. Vector search enables finding relevant information based on meaning rather than just keywords, which is essential for Retrieval Augmented Generation (RAG) and semantic search applications.
+
 #### Leading Solutions (Ranked by Performance)
 1. **OpenAI Embeddings (text-embedding-3)**
    - Dimensions: 1536 or 3072
@@ -253,7 +255,7 @@ Investigation into modern AI tooling, best practices, ranked models, and related
 
 ### 8. Fine-tuning & Training Tools
 
-#### Platforms (Ranked by Ease of Use)
+#### Platforms (Ranked by Accessibility & Ease of Use)
 1. **OpenAI Fine-tuning**
    - Models: GPT-3.5, GPT-4 (limited)
    - Use Cases: Task-specific optimization
