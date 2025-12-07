@@ -437,15 +437,15 @@ Given your preference to avoid medication or explore it as a last resort, consid
 
 ## Personal Reflection Notes
 
-Based on your experience with medication feeling like it keeps you "below normal," it's worth noting:
+For those who have experienced medication keeping them "below normal" or feeling emotionally flattened:
 
-- **Many people report similar experiences** with feeling emotionally flattened by antidepressants
+- **Many people report similar experiences** with feeling emotionally subdued by antidepressants
 - **Non-medication approaches can be equally effective** for mild to moderate depression
 - **Combination of therapy and lifestyle changes** often provides sustainable improvement
-- **The goal is flourishing, not just functioning** - your instinct to seek approaches that allow you to reach "normal" rather than stay subdued is valid
+- **The goal is flourishing, not just functioning** - seeking approaches that allow reaching normal functioning rather than feeling subdued is a valid priority
 - **Building resilience through skills** may be more empowering than symptom management alone
 
-However, keep in mind that if depression becomes severe or dangerous, medication may be a necessary bridge to allow you to engage with other treatments. The key is finding approaches that support your authentic functioning rather than suppress it.
+However, it's important to recognize that if depression becomes severe or dangerous, medication may be a necessary bridge to allow engagement with other treatments. The key is finding approaches that support authentic functioning rather than suppress it.
 
 ## Ongoing Research and Updates
 
