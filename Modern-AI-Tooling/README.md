@@ -1,42 +1,90 @@
 # Modern AI Tooling Research
 
+## ⚠️ Important Notice
+**Model information in this document should be verified against current vendor websites.** AI models evolve rapidly with new releases superseding older versions. For the most current model comparisons, pricing, and community feedback, see the **[Model Comparison Matrix](./MODEL_MATRIX.md)**.
+
+**Last Major Update**: December 2025  
+**Status**: Requires quarterly vendor verification
+
 ## Research Objective
 Investigation into modern AI tooling, best practices, ranked models, and related research into current best practices. This research breaks down AI capabilities into various usage-based categories.
+
+## 📊 Quick Links
+- **[Model Comparison Matrix](./MODEL_MATRIX.md)** - Comprehensive comparison tables with pros/cons, pricing, and community ratings
+- **[Quick Reference Guide](./QUICK_REFERENCE.md)** - Fast decision-making guide
+- **Main Document** (below) - Detailed research and best practices
 
 ## Research Categories
 
 ### 1. Text Generation & Chat Models
 
-#### Leading Models (Ranked by Performance)
-1. **GPT-4 Turbo** (OpenAI)
-   - Best for: Complex reasoning, long-form content, creative writing
-   - Context: 128K tokens
-   - Pricing: Higher tier
-   - Use Cases: Advanced chatbots, content creation, analysis
+> **📊 See [Model Comparison Matrix](./MODEL_MATRIX.md#text-generation--chat-models) for comprehensive comparison table with pros/cons, pricing, and community ratings.**
 
-2. **Claude 3 Opus** (Anthropic)
-   - Best for: Safety-focused applications, nuanced understanding
-   - Context: 200K tokens
-   - Pricing: Premium
-   - Use Cases: Research assistance, ethical AI applications
+#### Current Generation Models (As of December 2025)
+
+**OpenAI Models**:
+- **GPT-4o** - Multi-modal, fast, balanced cost/performance
+- **GPT-4 Turbo** - Maximum capability for complex tasks
+- **o1** / **o1-mini** - Advanced reasoning models for complex problem-solving
+
+**Anthropic Models**:
+- **Claude 3.5 Sonnet** - Excellent code generation, balanced performance
+- **Claude 3 Opus** - Highest capability for critical tasks
+- **Claude 3 Haiku** - Fast, cost-effective for high-volume
+
+**Google Models**:
+- **Gemini 1.5 Pro** - Multi-modal with 2M token context
+- **Gemini 1.5 Flash** - Fast, affordable alternative
+
+**Meta Models**:
+- **Llama 3.1** (405B/70B/8B) - Leading open-source models
+
+**Other Notable Models**:
+- **Mistral Large/Small** - European providers, multilingual focus
+
+#### Model Selection by Use Case
+
+1. **GPT-4 Turbo / GPT-4o** (OpenAI)
+   - Best for: Complex reasoning, multi-modal tasks, general purpose
+   - Context: 128K tokens
+   - Pricing: $5-10 per 1M input tokens
+   - Use Cases: Production chatbots, content creation, analysis
+   - Community: ⭐⭐⭐⭐⭐ Most trusted for reliability
+
+2. **o1 / o1-mini** (OpenAI)
+   - Best for: Deep reasoning, mathematics, complex problem-solving
+   - Context: 128K tokens
+   - Pricing: $3-15 per 1M input tokens
+   - Use Cases: Research, advanced coding, mathematical proofs
+   - Community: ⭐⭐⭐⭐ Highly rated for complex tasks
 
 3. **Claude 3.5 Sonnet** (Anthropic)
-   - Best for: Balance of performance and cost
+   - Best for: Code generation, balanced performance/cost
    - Context: 200K tokens
-   - Pricing: Mid-tier
-   - Use Cases: General purpose chat, content generation
+   - Pricing: ~$3 per 1M input tokens
+   - Use Cases: Software development, technical writing
+   - Community: ⭐⭐⭐⭐⭐ Developer favorite
 
-4. **Gemini 1.5 Pro** (Google)
-   - Best for: Multi-modal understanding, long context
-   - Context: 2M tokens (experimental)
-   - Pricing: Competitive
-   - Use Cases: Document analysis, research synthesis
+4. **Claude 3 Opus** (Anthropic)
+   - Best for: Safety-focused applications, nuanced understanding
+   - Context: 200K tokens
+   - Pricing: Premium tier (~$15 per 1M input tokens)
+   - Use Cases: Research assistance, ethical AI applications
+   - Community: ⭐⭐⭐⭐ Trusted for critical work
 
-5. **Llama 3** (Meta)
-   - Best for: Open-source deployments, customization
-   - Context: 8K-32K tokens (varies by version)
-   - Pricing: Free (self-hosted)
+5. **Gemini 1.5 Pro** (Google)
+   - Best for: Multi-modal understanding, extremely long context
+   - Context: 2M tokens
+   - Pricing: Competitive (~$1.25 per 1M input tokens)
+   - Use Cases: Document analysis, video understanding
+   - Community: ⭐⭐⭐ Improving, mixed reviews
+
+6. **Llama 3.1** (Meta)
+   - Best for: Open-source deployments, privacy, customization
+   - Context: 128K tokens
+   - Pricing: Free (self-hosted compute costs)
    - Use Cases: Privacy-focused applications, custom fine-tuning
+   - Community: ⭐⭐⭐⭐⭐ Open-source standard
 
 #### Best Practices
 - Use streaming for better UX
@@ -86,30 +134,58 @@ Investigation into modern AI tooling, best practices, ranked models, and related
 
 ### 3. Image Generation & Processing
 
-#### Leading Models (Ranked by Quality)
-1. **Midjourney v6**
+> **📊 See [Model Comparison Matrix](./MODEL_MATRIX.md#image-generation-models) for detailed comparison with quality ratings and community feedback.**
+
+#### Current Leading Models (December 2025)
+
+1. **Midjourney v6.1**
    - Best for: Artistic images, photorealism
-   - Access: Discord bot
+   - Access: Discord bot, web interface
    - Pricing: $10-120/month
-   - Strengths: Style consistency, quality
+   - Strengths: Consistent style, exceptional quality
+   - Community: ⭐⭐⭐⭐⭐ Artist favorite
 
 2. **DALL-E 3** (OpenAI)
    - Best for: Prompt adherence, text in images
    - Access: ChatGPT Plus, API
-   - Pricing: API-based or $20/month
-   - Strengths: Understanding complex prompts
+   - Pricing: $0.04-0.12 per image
+   - Strengths: Understanding complex prompts, reliability
+   - Community: ⭐⭐⭐⭐ Trusted quality
 
-3. **Stable Diffusion XL**
-   - Best for: Open-source, customization
+3. **Flux Pro/Dev** (Black Forest Labs)
+   - Best for: Photorealism, high-quality outputs
+   - Access: API, various platforms
+   - Pricing: API-based
+   - Strengths: Cutting-edge quality, photorealism
+   - Community: ⭐⭐⭐⭐⭐ Emerging favorite (2025)
+
+4. **Ideogram 2.0**
+   - Best for: Text rendering in images, typography
+   - Access: Web interface, API
+   - Pricing: $8-48/month
+   - Strengths: Best text-in-image capability
+   - Community: ⭐⭐⭐⭐⭐ Top choice for text
+
+5. **Stable Diffusion 3** (Stability AI)
+   - Best for: Open-source, latest quality
+   - Access: Self-hosted, API
+   - Pricing: Free (self-hosted) or API-based
+   - Strengths: Improved quality over SDXL, customizable
+   - Community: ⭐⭐⭐⭐ Promising evolution
+
+6. **Stable Diffusion XL**
+   - Best for: Customization, fine-tuning
    - Access: Self-hosted, various platforms
    - Pricing: Free (self-hosted)
-   - Strengths: Fine-tuning, community models
+   - Strengths: Mature ecosystem, community models
+   - Community: ⭐⭐⭐⭐⭐ OSS standard
 
-4. **Adobe Firefly**
+7. **Adobe Firefly**
    - Best for: Commercial use, Adobe integration
    - Access: Adobe Creative Cloud
    - Pricing: Subscription-based
    - Strengths: Commercially safe training data
+   - Community: ⭐⭐⭐⭐ Professional standard
 
 #### Best Practices
 - Use detailed, specific prompts

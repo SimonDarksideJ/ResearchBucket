@@ -20,17 +20,24 @@ Research-Subject-Name/
 
 Investigation into modern AI tooling, best practices, ranked models, and related research into current best practices. This research breaks down AI capabilities into usage-based categories:
 
-- Text Generation & Chat Models
-- Code Generation & Assistance
-- Image Generation & Processing
-- Audio & Speech Processing
+- Text Generation & Chat Models (GPT-4o, o1, Claude 3.x, Gemini, Llama)
+- Code Generation & Assistance (Copilot, Cursor, etc.)
+- Image Generation & Processing (Midjourney, Flux, DALL-E, Ideogram)
+- Audio & Speech Processing (Whisper, ElevenLabs)
 - Video Generation & Processing
 - Multi-modal Models
 - Embeddings & Vector Search
 - Fine-tuning & Training Tools
 
+**Documents**:
+- 📊 **[Model Comparison Matrix](./Modern-AI-Tooling/MODEL_MATRIX.md)** - Comprehensive comparison tables with pros/cons, pricing, and community ratings
+- 📖 **[Main Research Document](./Modern-AI-Tooling/README.md)** - Detailed research and best practices
+- ⚡ **[Quick Reference](./Modern-AI-Tooling/QUICK_REFERENCE.md)** - Fast decision-making guide
+- 🔄 **[Update Guide](./Modern-AI-Tooling/UPDATE_GUIDE.md)** - How to keep information current with vendor websites
+
 **Status**: Active Research  
-**Last Updated**: December 2024
+**Last Updated**: December 2025  
+**Next Review**: March 2026
 
 ## How to Use This Repository
 

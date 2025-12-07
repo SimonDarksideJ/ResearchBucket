@@ -1,25 +1,35 @@
 # Modern AI Tooling - Quick Reference Guide
 
+## ⚠️ Important Update Notice
+**AI models evolve rapidly.** For comprehensive comparisons with pros/cons, pricing, and community ratings, see the **[Model Comparison Matrix](./MODEL_MATRIX.md)**.
+
+**Last Updated**: December 2025
+
+---
+
 ## Quick Model Selection Guide
 
 ### Need to Choose an AI Model? Start Here:
 
 #### For Chat & Text Generation
-- **Most Capable**: GPT-4 Turbo or Claude 3 Opus
-- **Best Value**: Claude 3.5 Sonnet or Gemini 1.5 Pro
-- **Open Source**: Llama 3 (70B or 8B)
+- **Most Capable**: o1 (deep reasoning) or GPT-4 Turbo (general)
+- **Best Value**: GPT-4o or Claude 3.5 Sonnet
+- **Fast & Cheap**: Claude 3 Haiku or Gemini 1.5 Flash
+- **Open Source**: Llama 3.1 (405B/70B/8B)
 - **Longest Context**: Gemini 1.5 Pro (2M tokens)
 
 #### For Code Generation
 - **IDE Integration**: GitHub Copilot
 - **Full Editor**: Cursor
-- **API/Chat**: Claude 3.5 Sonnet
-- **Self-Hosted**: Code Llama or StarCoder
+- **API/Chat**: Claude 3.5 Sonnet (best quality)
+- **Reasoning**: o1 or o1-mini
+- **Self-Hosted**: Llama 3.1 or Code Llama
 
 #### For Image Generation
-- **Artistic**: Midjourney v6
-- **Prompt Accuracy**: DALL-E 3
-- **Open Source**: Stable Diffusion XL
+- **Artistic**: Midjourney v6.1 or Flux Pro
+- **Text in Images**: Ideogram 2.0 or DALL-E 3
+- **Photorealism**: Flux Pro or Midjourney
+- **Open Source**: Stable Diffusion 3 or SDXL
 - **Commercial Safe**: Adobe Firefly
 
 #### For Speech/Audio
@@ -32,25 +42,38 @@
 - **Multilingual**: Cohere
 - **Self-Hosted**: sentence-transformers
 
-## Cost Comparison (Approximate Monthly)
+## Cost Comparison (Approximate)
 
-**Note**: Pricing is approximate and subject to change. Always verify current pricing on provider websites. Last updated: December 2024.
+**⚠️ Note**: Pricing changes frequently. Always verify current pricing on provider websites. See [Model Matrix](./MODEL_MATRIX.md) for detailed pricing. Last updated: December 2025.
 
-### Chat Models (API)
-- GPT-4 Turbo: ~$0.01 per 1K input tokens
-- Claude 3.5 Sonnet: ~$0.003 per 1K input tokens
-- Gemini 1.5 Pro: ~$0.00125 per 1K input tokens
-- Llama 3: Free (self-hosted compute costs)
+### Chat Models (API - per 1M tokens)
+- **o1**: ~$15 input / $60 output (deep reasoning)
+- **o1-mini**: ~$3 input / $12 output (cost-effective reasoning)
+- **GPT-4 Turbo**: ~$10 input / $30 output
+- **GPT-4o**: ~$5 input / $15 output (multi-modal)
+- **Claude 3 Opus**: ~$15 input / $75 output
+- **Claude 3.5 Sonnet**: ~$3 input / $15 output
+- **Claude 3 Haiku**: ~$0.25 input / $1.25 output (fast/cheap)
+- **Gemini 1.5 Pro**: ~$1.25 input / $5 output
+- **Gemini 1.5 Flash**: ~$0.075 input / $0.30 output (very cheap)
+- **Llama 3.1**: Free (self-hosted compute costs)
+- **Mistral Large**: ~$4 input / $12 output
+- **Mistral Small**: ~$1 input / $3 output
 
-### Code Assistants
-- GitHub Copilot: $10-19/month
-- Cursor: $20/month
-- Amazon CodeWhisperer: Free tier available
+### Code Assistants (Monthly Subscription)
+- **GitHub Copilot**: $10-19/month (or $100-190/year)
+- **Cursor**: $20/month
+- **Codeium**: Free-$12/month
+- **Tabnine**: $12-39/user/month
+- **Amazon CodeWhisperer**: Free tier available
+- **Replit AI**: $20/month
 
 ### Image Generation
-- Midjourney: $10-120/month
-- DALL-E 3: $0.04 per image (API) or $20/month (ChatGPT Plus)
-- Stable Diffusion: Free (self-hosted)
+- **Midjourney**: $10-120/month
+- **DALL-E 3**: $0.04-0.12 per image (API) or $20/month (ChatGPT Plus)
+- **Flux**: API-based pricing
+- **Ideogram**: $8-48/month
+- **Stable Diffusion**: Free (self-hosted)
 
 ## Common Use Cases & Recommended Tools
 
