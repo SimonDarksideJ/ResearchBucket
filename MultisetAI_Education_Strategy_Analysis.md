@@ -184,7 +184,7 @@ This report provides a comprehensive analysis of Multiset AI's educational conte
 - ⭐⭐⭐⭐⭐ (Excellent): 6 pages (18%)
 - ⭐⭐⭐⭐ (Very Good): 8 pages (24%)
 - ⭐⭐⭐ (Good): 12 pages (35%)
-- ⭐⭐ (Needs Improvement): 8 pages (23%)
+- ⭐⭐ (Needs Improvement): 8 pages (24%)
 
 **Key Findings:**
 1. **Imbalance:** 44% feature docs vs 35% educational content
