@@ -45,6 +45,9 @@
 - Compare to peer umbrella/payroll providers (e.g., Brookson/Parasol/Danbro cohort) that market mobile-first self-service, proactive compliance alerts, and analytics dashboards; PayStream’s public site stresses compliance/service but little on insight/automation differentiators.
 - Ask how customer feedback is gathered (surveys, embedded analytics, A/B tests), how often SLAs are missed, and time-to-fix for production defects; request examples of issues raised publicly that were addressed and their turnaround.
 - Look for indications they prioritise long-term service quality over margin optimisation: investment in support tooling, observability, incident communication, and transparent roadmap updates.
+- Public review snapshots (e.g., Trustpilot/Google) show umbrella/payroll providers typically cluster in the mid-range (roughly 3–4/5). PayStream appears broadly in-line with peers: positive notes on helpful support and compliant processes; recurring negatives reference occasional payout delays, portal UX friction, and responsiveness. Confirm current scores and trend lines at decision time.
+- Relative positioning: competitors increasingly advertise mobile-first self-service, real-time notifications, and richer analytics dashboards. PayStream’s public posture emphasizes compliance and service; differentiators in insight/automation are not clearly messaged.
+- Responsiveness: look for evidence of vendor replies on review platforms, dated release notes, and issue-to-fix lead times. Limited public responses suggest a potential gap in visible follow-through; verify internally how feedback is triaged and closed.
 
 ## Due diligence / open items before accepting
 - Validate **roadmap and funding** for multi-year modernisation; confirm protected engineering time for refactoring and testing.
