@@ -1,4 +1,4 @@
-# Paystream Principal Developer – critical assessment
+# Paystream Principal Developer — critical assessment
 
 ## What the role is really asking for
 - **Senior hands-on architect/lead**: joint owner of technical direction with the Tech Lead; designs solutions, sets standards, unblocks complex issues.
@@ -27,9 +27,9 @@
 - Curiosity and coaching orientation; champions testing/observability as cultural norms.
 
 ## Company snapshot (PayStream)
-- UK fintech/umbrella payroll provider handling sensitive payments and data; holds “Great Place to Work” accreditation and industry awards.
-- Currently re-investing in platform modernisation; emphasis on Azure, microservices, automation, and security hardening is implied.
-- Public domain signals a **stable, regulated, service-oriented business**; due diligence should confirm financial health (Companies House), regulatory posture, and incident history.
+- UK fintech/umbrella payroll provider handling sensitive payments and data. Holds “Great Place to Work” accreditation and industry awards.
+- Currently re-investing in platform modernisation. Emphasis on Azure, microservices, automation, and security hardening is implied.
+- Public domain signals a **stable, regulated, service-oriented business**. Due diligence should confirm financial health (Companies House), regulatory posture, and incident history.
 - Culture indicators to verify: autonomy granted to engineering, appetite for change vs. compliance constraints, and how “Great Place to Work” feedback aligns with engineering experience.
 
 ## Due diligence / open items before accepting
