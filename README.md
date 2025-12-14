@@ -32,6 +32,13 @@
 - Public domain signals a **stable, regulated, service-oriented business**. Due diligence should confirm financial health (Companies House), regulatory posture, and incident history.
 - Culture indicators to verify: autonomy granted to engineering, appetite for change vs. compliance constraints, and how “Great Place to Work” feedback aligns with engineering experience.
 
+## Public offerings & modernisation signals (from public site/role spec)
+- Publicly listed offerings remain payroll/umbrella, accounting, and tax services for contractors and agencies; online assets show calculators, portals, and compliance-focused content but no explicit AI/ML-enabled features or data products.
+- Stated “technical transformation” focuses on .NET/Azure/microservices/CI-CD uplift; no published AI/ML roadmap, applied data/analytics strategy, or customer-facing automation beyond workflow digitisation.
+- Opportunity areas: identity/fraud risk controls with anomaly detection, smarter expense/claims automation, conversational support for contractors/agencies, pricing/retention analytics, and document understanding for onboarding/compliance.
+- Clarify whether data foundations (governance, MDM, event streams, telemetry lake) are in place to support future AI/analytics; absence of this in public signals suggests a gap.
+- Ask for any board-level or regulatory constraints on AI usage (GDPR, fairness, model risk) and whether budget/time is earmarked for AI experimentation in the modernisation program.
+
 ## Due diligence / open items before accepting
 - Validate **roadmap and funding** for multi-year modernisation; confirm protected engineering time for refactoring and testing.
 - Ask for **recent post-incident review** or reliability metrics (uptime, latency, change fail rate) and on-call expectations.
