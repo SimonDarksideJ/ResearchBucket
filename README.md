@@ -39,6 +39,13 @@
 - Clarify whether data foundations (governance, MDM, event streams, telemetry lake) are in place to support future AI/analytics; absence of this in public signals suggests a gap.
 - Ask for any board-level or regulatory constraints on AI usage (GDPR, fairness, model risk) and whether budget/time is earmarked for AI experimentation in the modernisation program.
 
+## Customer sentiment & competitive positioning (public signals to probe)
+- Public-facing materials do not publish NPS/CSAT or a “consumer index”; review Trustpilot/Google/industry forums for themes on support responsiveness, payslip accuracy, portal usability (desktop/mobile), and fee transparency.
+- Scan app store/portal reviews (if applicable) for stability/performance complaints and backlog of unresolved issues; ask for cadence of release notes and how feedback is triaged.
+- Compare to peer umbrella/payroll providers (e.g., Brookson/Parasol/Danbro cohort) that market mobile-first self-service, proactive compliance alerts, and analytics dashboards; PayStream’s public site stresses compliance/service but little on insight/automation differentiators.
+- Ask how customer feedback is gathered (surveys, embedded analytics, A/B tests), how often SLAs are missed, and time-to-fix for production defects; request examples of issues raised publicly that were addressed and their turnaround.
+- Look for indications they prioritise long-term service quality over margin optimisation: investment in support tooling, observability, incident communication, and transparent roadmap updates.
+
 ## Due diligence / open items before accepting
 - Validate **roadmap and funding** for multi-year modernisation; confirm protected engineering time for refactoring and testing.
 - Ask for **recent post-incident review** or reliability metrics (uptime, latency, change fail rate) and on-call expectations.
