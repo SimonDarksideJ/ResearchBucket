@@ -2,7 +2,7 @@
 
 ## Suspicious contact evaluation (berrybrian347 [at] gmail [dot] com, assessed 2025-12-14)
 
-*Purpose: logged as a project-specific incident record for traceability; contact address is obfuscated to reduce exposure while retaining attribution.*
+*Purpose: logged as a project-specific incident record for traceability (per request). If this file is published publicly, move this section to an internal security log and replace the address with an internal identifier; the contact address is obfuscated to reduce exposure while retaining attribution.*
 
 - **Summary of claim:** An unsolicited email from “Brian” offering collaboration for a developer with 5+ years experience and C1 English, without naming any project, company, or role.
 - **Source validation:** The message originates from the generic Gmail address above with no company attribution, website, or verifiable identity. This prevents confirming the sender’s legitimacy or intent.
