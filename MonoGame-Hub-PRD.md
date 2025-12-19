@@ -11,6 +11,8 @@ To create a modern, intuitive, and powerful hub that empowers MonoGame developer
 
 ## Technical Architecture
 
+> **Note**: For a comprehensive analysis of framework options, see [Framework-Analysis.md](Framework-Analysis.md), which compares 8 modern cross-platform frameworks including Avalonia UI, .NET MAUI, Uno Platform, Electron, Tauri, Flutter, Qt, and Neutralinojs. Avalonia UI scored 93/100 and was selected for its perfect .NET integration and true cross-platform support including Linux.
+
 ### Framework Selection: Avalonia UI
 
 **Primary Framework:** Avalonia UI (https://avaloniaui.net/)
@@ -25,10 +27,10 @@ To create a modern, intuitive, and powerful hub that empowers MonoGame developer
 - **Designer Support**: Visual Studio and Rider integration
 
 **Technology Stack:**
-- **UI Framework**: Avalonia UI 11.x
+- **UI Framework**: Avalonia UI 11.x (with .NET 10 support)
 - **Architecture Pattern**: MVVM (Model-View-ViewModel)
 - **Dependency Injection**: Microsoft.Extensions.DependencyInjection
-- **.NET Version**: .NET 8.0 (with forward compatibility for .NET 9/10)
+- **.NET Version**: .NET 10.0 (current latest)
 - **Package Management**: NuGet
 - **Data Storage**: SQLite for local project database
 - **HTTP Client**: System.Net.Http for API calls
@@ -214,9 +216,9 @@ MonoGameHub/
 #### 4.2 Development Environment
 - **Detected .NET SDK Version**: Display current version
 - **Install .NET Links**:
-  - .NET 8 download link (platform-specific)
   - .NET 9 download link (platform-specific)
   - .NET 10 download link (platform-specific)
+  - .NET 11 download link (platform-specific)
 - **Preferred IDE**: Dropdown selection
   - Visual Studio (Windows only)
   - Visual Studio Code
@@ -339,7 +341,7 @@ MonoGameHub/
 │                                                          │
 │                                                          │
 ├────────────────────────────────────────────────────────┤
-│  Status: Ready               MonoGame v3.8.1 | .NET 8.0 │
+│  Status: Ready               MonoGame v3.8.1 | .NET 10.0 │
 └────────────────────────────────────────────────────────┘
 ```
 
@@ -501,8 +503,8 @@ MonoGameHub/
 │  └───────────────────────────────────────────────────┘  │
 │  ┌─ Development Environment ─────────────────────────┐  │
 │  │                                                   │  │
-│  │  Current .NET SDK: 8.0.404                       │  │
-│  │  [Download .NET 8] [Download .NET 9]            │  │
+│  │  Current .NET SDK: 10.0.101                      │  │
+│  │  [Download .NET 9] [Download .NET 10]           │  │
 │  │                                                   │  │
 │  │  Preferred IDE                                   │  │
 │  │  ┌──────────────────────────────┐               │  │
@@ -1152,25 +1154,25 @@ Task<string> GetDotNetVersionAsync();
 - CPU: 1 GHz or faster
 - RAM: 2 GB
 - Disk: 200 MB free space
-- .NET: .NET 8 SDK or higher
+- .NET: .NET 10 SDK or higher
 
 **macOS:**
 - OS: macOS 12 Monterey or higher
 - CPU: Intel or Apple Silicon
 - RAM: 2 GB
 - Disk: 200 MB free space
-- .NET: .NET 8 SDK or higher
+- .NET: .NET 10 SDK or higher
 
 **Linux:**
 - OS: Ubuntu 20.04, Fedora 36, or equivalent
 - CPU: 1 GHz or faster
 - RAM: 2 GB
 - Disk: 200 MB free space
-- .NET: .NET 8 SDK or higher
+- .NET: .NET 10 SDK or higher
 - Display: X11 or Wayland
 
 ### Dependencies
-- .NET 8.0 SDK
+- .NET 10.0 SDK
 - Avalonia UI 11.x
 - SQLite 3.x
 - System.Net.Http for API calls
