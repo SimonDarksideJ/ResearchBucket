@@ -1,0 +1,191 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:MonoGameHub.Desktop.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="700"
+        x:Class="MonoGameHub.Desktop.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="MonoGame Hub"
+        Width="1200" Height="700"
+        MinWidth="800" MinHeight="600">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto,*,Auto">
+        <!-- Header -->
+        <Border Grid.Row="0" Background="#1E1E1E" Padding="16">
+            <StackPanel Orientation="Horizontal" Spacing="16">
+                <TextBlock Text="🎮" FontSize="24" VerticalAlignment="Center"/>
+                <TextBlock Text="MonoGame Hub" 
+                          FontSize="20" 
+                          FontWeight="SemiBold"
+                          VerticalAlignment="Center"
+                          Foreground="White"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Main Content Area with TabControl -->
+        <TabControl Grid.Row="1" Background="#252525">
+            <!-- Projects Tab -->
+            <TabItem Header="📂 Projects">
+                <ScrollViewer>
+                    <StackPanel Margin="20" Spacing="16">
+                        <TextBlock Text="Projects" FontSize="24" FontWeight="Bold" Foreground="White"/>
+                        <TextBlock Text="Your MonoGame projects will appear here." 
+                                  FontSize="14" 
+                                  Foreground="#CCCCCC"/>
+                        <Button Content="Add Project Folder" 
+                               HorizontalAlignment="Left"
+                               Padding="12,8"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- Installs Tab -->
+            <TabItem Header="📦 Installs">
+                <ScrollViewer>
+                    <StackPanel Margin="20" Spacing="16">
+                        <TextBlock Text="Template Installs" FontSize="24" FontWeight="Bold" Foreground="White"/>
+                        <TextBlock Text="Manage MonoGame template versions." 
+                                  FontSize="14" 
+                                  Foreground="#CCCCCC"/>
+                        <Button Content="Refresh Templates" 
+                               HorizontalAlignment="Left"
+                               Padding="12,8"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- New Project Tab -->
+            <TabItem Header="➕ New Project">
+                <ScrollViewer>
+                    <StackPanel Margin="20" Spacing="16" MaxWidth="600">
+                        <TextBlock Text="Create New Project" FontSize="24" FontWeight="Bold" Foreground="White"/>
+                        
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Project Name" Foreground="#CCCCCC"/>
+                            <TextBox Watermark="Enter project name..." />
+                        </StackPanel>
+
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Location" Foreground="#CCCCCC"/>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBox Grid.Column="0" Watermark="Select project location..." />
+                                <Button Grid.Column="1" Content="Browse" Margin="8,0,0,0" Padding="12,8"/>
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Template" Foreground="#CCCCCC"/>
+                            <ComboBox HorizontalAlignment="Stretch">
+                                <ComboBoxItem Content="MonoGame Cross-Platform Desktop (DesktopGL)"/>
+                                <ComboBoxItem Content="MonoGame Windows Desktop (WindowsDX)"/>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <Button Content="Create Project" 
+                               HorizontalAlignment="Left"
+                               Padding="16,10"
+                               Margin="0,16,0,0"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- Settings Tab -->
+            <TabItem Header="⚙️ Settings">
+                <ScrollViewer>
+                    <StackPanel Margin="20" Spacing="20" MaxWidth="600">
+                        <TextBlock Text="Settings" FontSize="24" FontWeight="Bold" Foreground="White"/>
+                        
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="General" FontSize="18" FontWeight="SemiBold" Foreground="White"/>
+                            <Separator/>
+                        </StackPanel>
+
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Default Project Folder" Foreground="#CCCCCC"/>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBox Grid.Column="0" />
+                                <Button Grid.Column="1" Content="Browse" Margin="8,0,0,0" Padding="12,8"/>
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Theme" Foreground="#CCCCCC"/>
+                            <ComboBox HorizontalAlignment="Stretch">
+                                <ComboBoxItem Content="Light"/>
+                                <ComboBoxItem Content="Dark" IsSelected="True"/>
+                                <ComboBoxItem Content="System"/>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Development Environment" FontSize="18" FontWeight="SemiBold" Foreground="White"/>
+                            <Separator/>
+                        </StackPanel>
+
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Preferred IDE" Foreground="#CCCCCC"/>
+                            <ComboBox HorizontalAlignment="Stretch">
+                                <ComboBoxItem Content="Visual Studio"/>
+                                <ComboBoxItem Content="Visual Studio Code" IsSelected="True"/>
+                                <ComboBoxItem Content="JetBrains Rider"/>
+                                <ComboBoxItem Content="System Default"/>
+                            </ComboBox>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- News Tab -->
+            <TabItem Header="📰 News">
+                <ScrollViewer>
+                    <StackPanel Margin="20" Spacing="16">
+                        <TextBlock Text="MonoGame News" FontSize="24" FontWeight="Bold" Foreground="White"/>
+                        <TextBlock Text="Latest news and updates from the MonoGame community." 
+                                  FontSize="14" 
+                                  Foreground="#CCCCCC"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- Resources Tab -->
+            <TabItem Header="📚 Resources">
+                <ScrollViewer>
+                    <StackPanel Margin="20" Spacing="16">
+                        <TextBlock Text="Community Resources" FontSize="24" FontWeight="Bold" Foreground="White"/>
+                        <TextBlock Text="Discover tools, assets, and tutorials from the MonoGame community." 
+                                  FontSize="14" 
+                                  Foreground="#CCCCCC"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
+
+        <!-- Status Bar -->
+        <Border Grid.Row="2" Background="#1E1E1E" Padding="12,8">
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0" 
+                          Text="Ready" 
+                          FontSize="12"
+                          Foreground="#CCCCCC"
+                          VerticalAlignment="Center"/>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="16">
+                    <TextBlock Text="MonoGame v3.8.1" 
+                              FontSize="12"
+                              Foreground="#CCCCCC"
+                              VerticalAlignment="Center"/>
+                    <TextBlock Text=".NET 10.0" 
+                              FontSize="12"
+                              Foreground="#CCCCCC"
+                              VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+
+</Window>
