@@ -1,0 +1,14 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="MonoGameHub.App.Controls.LogWindow"
+        Width="900" Height="500"
+  Title="Logs"
+  Icon="avares://MonoGameHub.App/Assets/Branding/FullColorOnLight/LogoOnly.ico">
+
+  <Grid RowDefinitions="Auto,*" Margin="12">
+    <TextBlock Grid.Row="0" Text="{Binding Title, RelativeSource={RelativeSource AncestorType=Window}}" FontWeight="SemiBold" />
+    <Border Grid.Row="1" Classes="Card" BorderThickness="1" CornerRadius="6" Padding="6" Margin="0,8,0,0">
+      <ListBox ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource AncestorType=Window}}" />
+    </Border>
+  </Grid>
+</Window>

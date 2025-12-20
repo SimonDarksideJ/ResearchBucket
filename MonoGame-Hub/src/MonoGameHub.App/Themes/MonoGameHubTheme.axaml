@@ -1,0 +1,79 @@
+<Styles xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!--
+    MonoGame Hub theme:
+    - Uses official MonoGame accent orange (#e73c00)
+    - Provides light/dark palettes (ThemeDictionaries)
+    - Adds a simple card style with clear borders
+  -->
+
+  <Styles.Resources>
+    <ResourceDictionary>
+
+      <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Light">
+          <Color x:Key="MonoGameHub.Color.Accent">#FFE73C00</Color>
+          <Color x:Key="SystemAccentColor">#FFE73C00</Color>
+
+          <Color x:Key="MonoGameHub.Color.WindowBackground">#FFF6F7F9</Color>
+          <Color x:Key="MonoGameHub.Color.CardBackground">#FFFFFFFF</Color>
+          <Color x:Key="MonoGameHub.Color.CardBorder">#FFE5E7EB</Color>
+
+          <Color x:Key="MonoGameHub.Color.Text">#FF111827</Color>
+          <Color x:Key="MonoGameHub.Color.TextMuted">#FF6B7280</Color>
+
+          <x:String x:Key="MonoGameHub.SplashLogoUri">avares://MonoGameHub.App/Assets/Branding/FullColorOnLight/SquareLogo_256px.png</x:String>
+        </ResourceDictionary>
+
+        <ResourceDictionary x:Key="Dark">
+          <Color x:Key="MonoGameHub.Color.Accent">#FFE73C00</Color>
+          <Color x:Key="SystemAccentColor">#FFE73C00</Color>
+
+          <Color x:Key="MonoGameHub.Color.WindowBackground">#FF0F1115</Color>
+          <Color x:Key="MonoGameHub.Color.CardBackground">#FF151A22</Color>
+          <Color x:Key="MonoGameHub.Color.CardBorder">#FF283040</Color>
+
+          <Color x:Key="MonoGameHub.Color.Text">#FFE5E7EB</Color>
+          <Color x:Key="MonoGameHub.Color.TextMuted">#FF9CA3AF</Color>
+
+          <x:String x:Key="MonoGameHub.SplashLogoUri">avares://MonoGameHub.App/Assets/Branding/FullColorOnDark/SquareLogo_256px.png</x:String>
+        </ResourceDictionary>
+      </ResourceDictionary.ThemeDictionaries>
+
+      <!-- Shared brushes (use DynamicResource so they pick from Light/Dark dictionaries). -->
+      <SolidColorBrush x:Key="MonoGameHub.Brush.Accent" Color="{DynamicResource MonoGameHub.Color.Accent}" />
+      <SolidColorBrush x:Key="MonoGameHub.Brush.WindowBackground" Color="{DynamicResource MonoGameHub.Color.WindowBackground}" />
+      <SolidColorBrush x:Key="MonoGameHub.Brush.CardBackground" Color="{DynamicResource MonoGameHub.Color.CardBackground}" />
+      <SolidColorBrush x:Key="MonoGameHub.Brush.CardBorder" Color="{DynamicResource MonoGameHub.Color.CardBorder}" />
+      <SolidColorBrush x:Key="MonoGameHub.Brush.Text" Color="{DynamicResource MonoGameHub.Color.Text}" />
+      <SolidColorBrush x:Key="MonoGameHub.Brush.TextMuted" Color="{DynamicResource MonoGameHub.Color.TextMuted}" />
+
+    </ResourceDictionary>
+  </Styles.Resources>
+
+  <!-- Base window styling. -->
+  <Style Selector="Window">
+    <Setter Property="Background" Value="{DynamicResource MonoGameHub.Brush.WindowBackground}" />
+    <Setter Property="Foreground" Value="{DynamicResource MonoGameHub.Brush.Text}" />
+    <Setter Property="FontSize" Value="13" />
+  </Style>
+
+  <Style Selector="TextBlock.Muted">
+    <Setter Property="Foreground" Value="{DynamicResource MonoGameHub.Brush.TextMuted}" />
+  </Style>
+
+  <!-- Card surface: consistent border + background. -->
+  <Style Selector="Border.Card">
+    <Setter Property="Background" Value="{DynamicResource MonoGameHub.Brush.CardBackground}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource MonoGameHub.Brush.CardBorder}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="6" />
+  </Style>
+
+  <!-- Subtle accent for selected tabs. (Keep it conservative to avoid template fragility.) -->
+  <Style Selector="TabItem:selected">
+    <Setter Property="Foreground" Value="{DynamicResource MonoGameHub.Brush.Accent}" />
+  </Style>
+
+</Styles>

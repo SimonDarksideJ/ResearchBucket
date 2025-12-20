@@ -1,0 +1,80 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="clr-namespace:MonoGameHub.App.Views"
+        x:Class="MonoGameHub.App.Views.MainWindow"
+        Width="1100" Height="720"
+        MinWidth="900" MinHeight="600"
+  Title="MonoGame Hub"
+  Icon="avares://MonoGameHub.App/Assets/Branding/FullColorOnLight/LogoOnly.ico">
+
+  <Grid>
+    <TabControl SelectionChanged="OnTabSelectionChanged">
+      <TabItem Header="Projects">
+        <views:ProjectsView DataContext="{Binding Projects}" />
+      </TabItem>
+      <TabItem Header="Installs">
+        <views:InstallsView DataContext="{Binding Installs}" />
+      </TabItem>
+      <TabItem Header="New Project">
+        <views:NewProjectView DataContext="{Binding NewProject}" />
+      </TabItem>
+      <TabItem Header="Docs/API">
+        <views:DocsApiView DataContext="{Binding DocsApi}" />
+      </TabItem>      
+      <TabItem Header="Blog">
+        <views:BlogView DataContext="{Binding Blog}" />
+      </TabItem>
+      <TabItem Header="Resources">
+        <views:ResourcesView DataContext="{Binding Resources}" />
+      </TabItem>
+      <TabItem Header="Settings">
+        <views:SettingsView DataContext="{Binding Settings}" />
+      </TabItem>
+    </TabControl>
+
+    <!-- In-app announcement toast (bottom-right, fades out after ~5s). -->
+    <StackPanel IsVisible="{Binding ShowAnnouncement}"
+                Opacity="{Binding AnnouncementOpacity}"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Bottom"
+                Margin="12"
+                Width="320">
+      <StackPanel.Transitions>
+        <Transitions>
+          <DoubleTransition Property="Opacity" Duration="0:0:0.25" />
+        </Transitions>
+      </StackPanel.Transitions>
+
+      <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,6">
+        <TextBlock Text="New announcement" FontWeight="SemiBold" Foreground="{DynamicResource MonoGameHub.Brush.Accent}" />
+        <Button Grid.Column="1" Content="X" Padding="6,2" Command="{Binding CloseAnnouncementCommand}" />
+      </Grid>
+
+      <ContentControl Content="{Binding AnnouncementPost}">
+        <ContentControl.ContentTemplate>
+          <DataTemplate>
+            <Button Padding="0"
+                    HorizontalAlignment="Stretch"
+                    Command="{Binding DataContext.OpenAnnouncementCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                    CommandParameter="{Binding Url}">
+              <Border Classes="Card" CornerRadius="6" BorderThickness="1" ClipToBounds="True">
+                <Grid RowDefinitions="90,*">
+                  <Border Grid.Row="0" ClipToBounds="True">
+                    <Image Source="{Binding DataContext.AnnouncementThumbnail, RelativeSource={RelativeSource AncestorType=Window}}" Stretch="UniformToFill" />
+                  </Border>
+                  <Border Grid.Row="1" Padding="10">
+                    <StackPanel Spacing="4">
+                      <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" MaxLines="2" />
+                      <TextBlock Text="{Binding PublishedDate}" Classes="Muted" FontSize="12" />
+                    </StackPanel>
+                  </Border>
+                </Grid>
+              </Border>
+            </Button>
+          </DataTemplate>
+        </ContentControl.ContentTemplate>
+      </ContentControl>
+    </StackPanel>
+  </Grid>
+
+</Window>

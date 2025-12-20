@@ -1,0 +1,45 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="MonoGameHub.App.Controls.CollapsibleLogPanel">
+
+  <Border x:Name="RootBorder" Classes="Card" BorderThickness="1" CornerRadius="6">
+    <Border.Transitions>
+      <Transitions>
+        <DoubleTransition Property="Height" Duration="0:0:0.2" />
+      </Transitions>
+    </Border.Transitions>
+
+    <Grid RowDefinitions="Auto,*">
+      <!-- Clickable bar -->
+      <Border Grid.Row="0" Padding="8" PointerPressed="OnHeaderPressed">
+        <Grid ColumnDefinitions="*,Auto,Auto,Auto" VerticalAlignment="Center">
+          <TextBlock Text="{Binding Title, RelativeSource={RelativeSource AncestorType=UserControl}}" FontWeight="SemiBold" />
+
+          <Button Grid.Column="1" Content="Pop out"
+                  IsVisible="{Binding IsExpanded, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                  Click="OnPopOutClicked" />
+
+          <Button Grid.Column="2" Content="Copy"
+            IsVisible="{Binding IsExpanded, RelativeSource={RelativeSource AncestorType=UserControl}}"
+            Click="OnCopyClicked" />
+
+          <Button Grid.Column="3" Content="Collapse"
+                  IsVisible="{Binding IsExpanded, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                  Click="OnCollapseClicked" />
+        </Grid>
+      </Border>
+
+      <!-- Log content -->
+      <Border Grid.Row="1" BorderThickness="1,0,0,0"
+              IsVisible="{Binding IsExpanded, RelativeSource={RelativeSource AncestorType=UserControl}}">
+        <Grid RowDefinitions="Auto,*">
+          <!-- Drag handle to resize height -->
+          <Thumb Grid.Row="0" Height="6" DragDelta="OnResizeDragDelta" />
+          <Border Grid.Row="1" Padding="6">
+            <ListBox x:Name="LogListBox" ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+          </Border>
+        </Grid>
+      </Border>
+    </Grid>
+  </Border>
+</UserControl>

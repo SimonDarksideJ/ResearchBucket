@@ -1,0 +1,97 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:MonoGameHub.App.Controls"
+             x:Class="MonoGameHub.App.Views.ProjectsView"
+             mc:Ignorable="d">
+
+  <DockPanel Margin="12">
+
+    <controls:CollapsibleLogPanel DockPanel.Dock="Bottom" ItemsSource="{Binding LogLines}" Title="Logs" />
+
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*" ColumnDefinitions="2*,*">
+
+    <Grid Grid.Row="0" Grid.ColumnSpan="2" ColumnDefinitions="*,Auto">
+      <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
+        <TextBlock VerticalAlignment="Center" Text="Projects folder:" />
+        <Grid ColumnDefinitions="Auto,Auto">
+          <TextBox Grid.Column="0" Width="520" Text="{Binding ProjectsRoot, Mode=TwoWay}" />
+          <Button Grid.Column="1" Width="36" Content="..." Click="OnBrowseProjectsRootClicked" />
+        </Grid>
+        <Button Content="Scan" Command="{Binding RefreshCommand}" />
+      </StackPanel>
+
+      <Button Grid.Column="1" Content="Open project" HorizontalAlignment="Right" VerticalAlignment="Center"
+              Command="{Binding OpenProjectCommand}" CommandParameter="{Binding SelectedProject}" />
+    </Grid>
+
+    <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,12,0" Text="Discovered projects" />
+
+    <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal" Spacing="8" Margin="0,6,12,6">
+      <TextBlock VerticalAlignment="Center" Text="Sort:" />
+      <ComboBox Width="220" ItemsSource="{Binding SortOptions}" SelectedItem="{Binding SelectedSortOption, Mode=TwoWay}" />
+    </StackPanel>
+
+    <Grid Grid.Row="3" Grid.Column="0" ColumnDefinitions="*,Auto" Margin="0,0,12,6">
+      <TextBlock Text="Name" FontWeight="Bold" />
+      <TextBlock Grid.Column="1" Text="{Binding LastActivityHeader}" FontWeight="Bold" />
+    </Grid>
+
+    <Border Grid.Row="4" Grid.Column="0" Classes="Card" CornerRadius="6" Padding="8" BorderThickness="1" Margin="0,0,12,0">
+      <ListBox ItemsSource="{Binding Projects}" SelectedItem="{Binding SelectedProjectItem, Mode=TwoWay}" DoubleTapped="OnProjectsListDoubleTapped">
+        <ListBox.ItemTemplate>
+          <DataTemplate>
+            <Grid ColumnDefinitions="*,Auto" Margin="0,2" Background="{Binding RowBackground}">
+              <StackPanel>
+                <TextBlock Text="{Binding Project.Name}" FontWeight="SemiBold" />
+                <TextBlock Text="{Binding FolderDisplay}" Opacity="0.8" FontSize="12" />
+                <TextBlock Text="{Binding VersionDisplay}" Opacity="0.7" FontSize="12" />
+              </StackPanel>
+
+              <TextBlock Grid.Column="1" Text="{Binding LastActivityDisplay}" Opacity="0.8" Margin="12,0,0,0" />
+            </Grid>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </Border>
+
+    <Border Grid.Row="4" Grid.Column="1" Classes="Card" CornerRadius="6" Padding="8" BorderThickness="1">
+      <Grid RowDefinitions="Auto,*">
+        <TextBlock Text="Details" FontWeight="SemiBold" />
+
+        <TextBlock Grid.Row="1" Text="Select a project to see details." Opacity="0.7"
+                   IsVisible="{Binding NoSelectedProject}" />
+
+        <ContentControl Grid.Row="1" Content="{Binding SelectedProjectItem}" IsVisible="{Binding HasSelectedProject}">
+          <ContentControl.ContentTemplate>
+            <DataTemplate>
+              <Grid RowDefinitions="Auto,Auto,Auto,*">
+                <TextBlock Grid.Row="0" Text="{Binding Project.ProjectPath}" TextWrapping="Wrap" Opacity="0.8" />
+
+                <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="16" Margin="0,10,0,0">
+                  <TextBlock Text="Platforms:" />
+                  <TextBlock Text="{Binding Project.Platforms}" />
+                </StackPanel>
+
+                <TextBlock Grid.Row="2" TextWrapping="Wrap" Margin="0,10,0,0" IsVisible="{Binding IsToolsMisconfigured}" Text="{Binding ToolsMisconfigurationNote}" />
+
+                <StackPanel Grid.Row="3" Spacing="4" Margin="0,10,0,0">
+                  <TextBlock Text="Legacy MGCB:" />
+                  <TextBlock Text="{Binding Project.UsesLegacyMgcb}" />
+                  <TextBlock Text="New pipeline:" />
+                  <TextBlock Text="{Binding Project.UsesNewPipeline}" />
+                  <TextBlock Text="Resolved version:" />
+                  <TextBlock Text="{Binding Project.ResolvedMonoGameVersion}" />
+                </StackPanel>
+              </Grid>
+            </DataTemplate>
+          </ContentControl.ContentTemplate>
+        </ContentControl>
+      </Grid>
+    </Border>
+
+    </Grid>
+
+  </DockPanel>
+</UserControl>

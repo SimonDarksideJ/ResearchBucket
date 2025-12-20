@@ -1,0 +1,84 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:MonoGameHub.App.Controls"
+             x:Class="MonoGameHub.App.Views.InstallsView"
+             mc:Ignorable="d">
+
+  <DockPanel Margin="12">
+
+    <controls:CollapsibleLogPanel DockPanel.Dock="Bottom" ItemsSource="{Binding LogLines}" Title="Logs"
+                   IsExpanded="{Binding IsLogExpanded, Mode=TwoWay}" />
+
+    <Grid RowDefinitions="Auto,*" ColumnDefinitions="1*,3*">
+
+    <Grid Grid.Row="0" Grid.ColumnSpan="2" ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,8">
+      <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
+        <TextBlock VerticalAlignment="Center" Text="Template package ID:" />
+        <TextBox Width="320" Text="{Binding TemplatePackageId, Mode=TwoWay}" />
+        <Button Content="Sync versions" Command="{Binding RefreshAvailableVersionsCommand}" />
+        <CheckBox VerticalAlignment="Center" Content="Show all" IsChecked="{Binding ShowAllVersions, Mode=TwoWay}" />
+      </StackPanel>
+
+      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+        <TextBlock Opacity="0.8" Text="Installed:" />
+        <TextBlock FontWeight="SemiBold" Text="{Binding InstalledTemplatePackVersion}" />
+      </StackPanel>
+
+      <Button Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Content="Install template"
+              Margin="12,0,0,0"
+              IsVisible="{Binding ShowInstallButton}"
+              IsEnabled="{Binding CanInstallSelectedVersion}"
+              Command="{Binding InstallSelectedVersionCommand}" />
+    </Grid>
+
+    <Border Grid.Row="1" Grid.Column="0" Classes="Card" CornerRadius="6" Padding="8" BorderThickness="1" Margin="0,0,12,0">
+      <Grid RowDefinitions="Auto,*">
+        <TextBlock Text="Available versions (latest stable + latest prerelease by default)" />
+        <ListBox Grid.Row="1" ItemsSource="{Binding AvailableVersions}" SelectedItem="{Binding SelectedVersion, Mode=TwoWay}">
+          <ListBox.ItemTemplate>
+            <DataTemplate>
+              <Border Padding="6" CornerRadius="6"
+                      Background="{Binding IsPrerelease, Converter={StaticResource PrereleaseBackgroundConverter}}">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <TextBlock Text="{Binding Version}" />
+                  <TextBlock Text="(pre-release)" IsVisible="{Binding IsPrerelease}" Opacity="0.8" />
+                </StackPanel>
+              </Border>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </Grid>
+    </Border>
+
+    <Border Grid.Row="1" Grid.Column="1" Classes="Card" CornerRadius="6" Padding="8" BorderThickness="1">
+      <Grid RowDefinitions="Auto,Auto,*">
+        <TextBlock Text="Templates in selected version" Margin="0,0,0,6" />
+
+        <TextBlock Grid.Row="1" Opacity="0.7" Text="Select a version to load its template list."
+             IsVisible="{Binding ShowSelectVersionHint}" />
+        <TextBlock Grid.Row="1" Opacity="0.7" Text="Loading templates…"
+             IsVisible="{Binding ShowLoadingTemplatesHint}" />
+        <TextBlock Grid.Row="1" Opacity="0.7" Text="No templates found for this version."
+             IsVisible="{Binding ShowNoTemplatesHint}" />
+
+        <Border Grid.Row="2" Classes="Card" BorderThickness="1" Padding="6" CornerRadius="6">
+          <ListBox ItemsSource="{Binding TemplatesInSelectedVersion}" IsVisible="{Binding HasTemplates}">
+            <ListBox.ItemTemplate>
+              <DataTemplate>
+                <Grid ColumnDefinitions="3*,2*" Margin="2">
+                  <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+                  <TextBlock Grid.Column="1" Text="{Binding TemplateId}" Opacity="0.8" />
+                </Grid>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </Border>
+      </Grid>
+    </Border>
+
+    </Grid>
+
+  </DockPanel>
+</UserControl>

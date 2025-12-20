@@ -1,0 +1,11 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="MonoGameHub.App.Controls.DocsTableView">
+
+  <Border Classes="Card" BorderThickness="1" CornerRadius="6" Padding="8" Margin="0,8,0,8">
+    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+      <Grid x:Name="TableGrid" />
+    </ScrollViewer>
+  </Border>
+
+</UserControl>

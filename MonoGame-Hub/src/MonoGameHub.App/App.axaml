@@ -1,0 +1,18 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:fluent="clr-namespace:Avalonia.Themes.Fluent;assembly=Avalonia.Themes.Fluent"
+             xmlns:converters="clr-namespace:MonoGameHub.App.Converters"
+             x:Class="MonoGameHub.App.App">
+  <Application.Resources>
+    <!-- MonoGame orange accent (can be adjusted later). -->
+    <Color x:Key="MonoGameOrange">#FFE73C00</Color>
+    <converters:PrereleaseBackgroundConverter x:Key="PrereleaseBackgroundConverter" />
+    <converters:ExistingProjectWarningBackgroundConverter x:Key="ExistingProjectWarningBackgroundConverter" />
+    <converters:ExistingProjectWarningForegroundConverter x:Key="ExistingProjectWarningForegroundConverter" />
+    <converters:StringToBitmapConverter x:Key="StringToBitmapConverter" />
+  </Application.Resources>
+  <Application.Styles>
+    <fluent:FluentTheme />
+    <StyleInclude Source="avares://MonoGameHub.App/Themes/MonoGameHubTheme.axaml" />
+  </Application.Styles>
+</Application>

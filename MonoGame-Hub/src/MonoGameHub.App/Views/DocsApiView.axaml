@@ -1,0 +1,88 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:MonoGameHub.App.Controls"
+             x:Class="MonoGameHub.App.Views.DocsApiView"
+             mc:Ignorable="d">
+
+  <Grid Margin="12" ColumnDefinitions="33*,67*">
+
+    <!-- Left: mode + search + TOC tree -->
+    <Border Grid.Column="0" Classes="Card" BorderThickness="1" CornerRadius="6" Padding="8">
+      <Grid RowDefinitions="Auto,Auto,*">
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8" Margin="0,0,0,8">
+          <RadioButton Content="Docs"
+                       GroupName="DocsApiMode"
+                       IsChecked="{Binding IsDocsMode, Mode=TwoWay}" />
+          <RadioButton Content="API"
+                       GroupName="DocsApiMode"
+                       IsChecked="{Binding IsApiMode, Mode=TwoWay}" />
+        </StackPanel>
+
+        <Grid Grid.Row="1" Margin="0,0,0,8">
+          <TextBox Watermark="Filter..."
+                   Padding="20,0,32,0"
+                   TextAlignment="Left"
+                   VerticalContentAlignment="Center"
+             Text="{Binding FilterText, Mode=TwoWay}" />
+          <Button Content="X"
+            Width="24"
+            Height="24"
+            Padding="0"
+            Margin="0,0,4,0"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Center"
+            IsVisible="{Binding ShowClearFilter}"
+            Command="{Binding ClearFilterCommand}" />
+        </Grid>
+
+        <Border Grid.Row="2" Classes="Card" BorderThickness="1" CornerRadius="6" Padding="6">
+          <ScrollViewer>
+            <TreeView x:Name="TocTree" ItemsSource="{Binding TocItems}"
+                      SelectedItem="{Binding SelectedTocItem, Mode=TwoWay}">
+              <TreeView.Styles>
+                <Style Selector="TreeViewItem">
+                  <Setter Property="IsExpanded">
+                    <Setter.Value>
+                      <Binding Path="IsExpanded" Mode="TwoWay" />
+                    </Setter.Value>
+                  </Setter>
+                </Style>
+              </TreeView.Styles>
+              <TreeView.ItemTemplate>
+                <TreeDataTemplate ItemsSource="{Binding Children}">
+                  <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" />
+                </TreeDataTemplate>
+              </TreeView.ItemTemplate>
+            </TreeView>
+          </ScrollViewer>
+        </Border>
+
+      </Grid>
+    </Border>
+
+    <!-- Right: page detail (logo when empty) -->
+    <Border Grid.Column="1" Classes="Card" BorderThickness="1" CornerRadius="6" Padding="12" Margin="12,0,0,0">
+      <Grid>
+
+        <Grid IsVisible="{Binding ShowLogo}">
+          <Image Source="{Binding Source={DynamicResource MonoGameHub.SplashLogoUri}, Converter={StaticResource StringToBitmapConverter}}"
+                 Stretch="Uniform"
+                 HorizontalAlignment="Center"
+                 VerticalAlignment="Center"
+                 MaxWidth="240"
+                 MaxHeight="240"
+                 Opacity="0.85" />
+        </Grid>
+
+        <ScrollViewer IsVisible="{Binding ShowContent}">
+          <controls:DocsMarkdownView Markdown="{Binding SelectedPageMarkdown}" />
+        </ScrollViewer>
+
+      </Grid>
+    </Border>
+
+  </Grid>
+</UserControl>

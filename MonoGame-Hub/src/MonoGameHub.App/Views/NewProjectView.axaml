@@ -1,0 +1,104 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:MonoGameHub.App.Controls"
+             x:Class="MonoGameHub.App.Views.NewProjectView"
+             mc:Ignorable="d">
+
+  <DockPanel Margin="12">
+
+    <controls:CollapsibleLogPanel DockPanel.Dock="Bottom" ItemsSource="{Binding LogLines}" Title="Logs"
+                   IsExpanded="{Binding IsLogExpanded, Mode=TwoWay}" />
+
+    <Grid RowDefinitions="15*,70*,15*">
+
+      <!-- Header (15%) -->
+      <Grid Grid.Row="0" RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto">
+        <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Spacing="8" Margin="0,0,0,8">
+          <TextBlock Width="110" VerticalAlignment="Center" Text="Project name" />
+          <TextBox Width="340" Text="{Binding ProjectName, Mode=TwoWay}"
+                   Background="{Binding ProjectFolderAlreadyExists, Converter={StaticResource ExistingProjectWarningBackgroundConverter}}"
+                   BorderBrush="{Binding ProjectFolderAlreadyExists, Converter={StaticResource ExistingProjectWarningForegroundConverter}}" />
+        </StackPanel>
+
+        <TextBlock Grid.Row="1" Grid.Column="0" Margin="110,0,0,8" Opacity="0.8"
+                   IsVisible="{Binding ProjectFolderAlreadyExists}"
+                   Foreground="{Binding ProjectFolderAlreadyExists, Converter={StaticResource ExistingProjectWarningForegroundConverter}}"
+                   Text="A project already exists with this name" />
+
+        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="12" HorizontalAlignment="Right" Margin="0,0,0,8">
+          <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+            <TextBlock Opacity="0.8" Text="Installed:" />
+            <TextBlock FontWeight="SemiBold" Text="{Binding InstalledTemplatePackVersion}" />
+          </StackPanel>
+
+          <Button Content="Create project" Command="{Binding CreateProjectCommand}" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="8">
+          <TextBlock Width="110" VerticalAlignment="Center" Text="Template" />
+          <Button Content="Refresh" Command="{Binding RefreshTemplatesCommand}" />
+        </StackPanel>
+      </Grid>
+
+      <!-- List (70%) -->
+      <Border Grid.Row="1" Classes="Card" BorderThickness="1" Padding="6" CornerRadius="6">
+        <Grid RowDefinitions="Auto,Auto,*">
+          <Grid Grid.Row="0" Margin="2,0,2,6">
+            <TextBlock Text="Templates" FontWeight="SemiBold" />
+          </Grid>
+
+          <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto" Margin="2,0,2,6">
+            <TextBlock Text="Template Name" FontWeight="Bold" />
+            <TextBlock Grid.Column="1" Text="Template ID" FontWeight="Bold" Margin="12,0,0,0" MaxWidth="320" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" />
+            <TextBlock Grid.Column="2" Text="Version" FontWeight="Bold" Margin="12,0,0,0" MaxWidth="140" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" />
+          </Grid>
+
+          <ListBox Grid.Row="2"
+                  ItemsSource="{Binding TemplateOptions}"
+                  SelectedItem="{Binding SelectedTemplate, Mode=TwoWay}"
+                  HorizontalAlignment="Stretch"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <ListBox.ItemsPanel>
+              <ItemsPanelTemplate>
+                <VirtualizingStackPanel HorizontalAlignment="Stretch" />
+              </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.Styles>
+              <Style Selector="ListBoxItem">
+                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+              </Style>
+            </ListBox.Styles>
+            <ListBox.ItemTemplate>
+              <DataTemplate>
+                <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto,Auto" Margin="2" HorizontalAlignment="Stretch">
+                  <TextBlock Grid.Row="0" Grid.ColumnSpan="3" Text="{Binding Name}" TextWrapping="Wrap" TextTrimming="None" />
+
+                  <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding TemplateId}" Opacity="0.8" Margin="12,2,0,0" MaxWidth="320" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Right" />
+                  <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Version}" Opacity="0.8" Margin="12,2,0,0" MaxWidth="140" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Right" />
+                </Grid>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </Grid>
+      </Border>
+
+      <!-- Footer (15%) -->
+      <Grid Grid.Row="2" RowDefinitions="Auto,Auto">
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8" Margin="0,0,0,8">
+          <TextBlock Width="110" VerticalAlignment="Center" Text="Output root" />
+          <Grid ColumnDefinitions="Auto,Auto">
+            <TextBox Grid.Column="0" Width="600" Text="{Binding OutputRoot, Mode=TwoWay}" />
+            <Button Grid.Column="1" Width="36" Content="..." Click="OnBrowseOutputRootClicked" />
+          </Grid>
+        </StackPanel>
+
+        <TextBlock Grid.Row="1" Opacity="0.7" Text="Templates are loaded from your installed dotnet template packages (MonoGame filtered by default)." />
+      </Grid>
+
+    </Grid>
+
+  </DockPanel>
+</UserControl>
