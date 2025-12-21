@@ -12,18 +12,32 @@ public sealed partial class InstallsViewModel : LoggableViewModel
     private readonly SettingsStore _settingsStore;
     private readonly TemplateManager _templates;
     private readonly NuGetVersionResolver _nuget;
-    private readonly DotNetCli _dotnet;
     private readonly TemplatePackState _templateState;
+    private readonly DotNetWorkloadState _workloadState;
+    private readonly DotNetWorkloadManager _workloadManager;
+    private readonly TemplateWorkloadRegistry _workloadRegistry;
+    private readonly ToolingSetupState _toolingStatus;
 
     private CancellationTokenSource? _templatesCts;
 
-    public InstallsViewModel(SettingsStore settingsStore, TemplateManager templates, NuGetVersionResolver nuget, DotNetCli dotnet, TemplatePackState templateState)
+    public InstallsViewModel(
+        SettingsStore settingsStore,
+        TemplateManager templates,
+        NuGetVersionResolver nuget,
+        TemplatePackState templateState,
+        DotNetWorkloadState workloadState,
+        DotNetWorkloadManager workloadManager,
+        TemplateWorkloadRegistry workloadRegistry,
+        ToolingSetupState toolingStatus)
     {
         _settingsStore = settingsStore;
         _templates = templates;
         _nuget = nuget;
-        _dotnet = dotnet;
         _templateState = templateState;
+        _workloadState = workloadState;
+        _workloadManager = workloadManager;
+        _workloadRegistry = workloadRegistry;
+        _toolingStatus = toolingStatus;
 
         RefreshAvailableVersionsCommand = new AsyncRelayCommand(RefreshAvailableVersionsAsync);
         InstallSelectedVersionCommand = new AsyncRelayCommand(InstallSelectedAsync);
@@ -36,6 +50,19 @@ public sealed partial class InstallsViewModel : LoggableViewModel
             {
                 OnPropertyChanged(nameof(InstalledTemplatePackVersion));
                 UpdateInstallState();
+                OnPropertyChanged(nameof(InstallButtonText));
+            }
+        };
+
+        _workloadState.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName is nameof(DotNetWorkloadState.InstalledWorkloads)
+                or nameof(DotNetWorkloadState.UpdatesAvailable)
+                or nameof(DotNetWorkloadState.MissingDesiredWorkloads))
+            {
+                UpdateInstallState();
+                OnPropertyChanged(nameof(InstallButtonText));
+                RefreshTemplateWorkloadBadges();
             }
         };
 
@@ -57,6 +84,8 @@ public sealed partial class InstallsViewModel : LoggableViewModel
 
     public string InstalledTemplatePackVersion => _templateState.InstalledTemplatePackVersion;
 
+    public ToolingSetupState ToolingStatus => _toolingStatus;
+
     public ObservableCollection<TemplateVersionInfo> AvailableVersions { get; } = new();
 
     // Default: show only latest stable + latest prerelease.
@@ -66,7 +95,7 @@ public sealed partial class InstallsViewModel : LoggableViewModel
     [ObservableProperty]
     private TemplateVersionInfo? _selectedVersion;
 
-    public ObservableCollection<TemplatePackTemplateInfo> TemplatesInSelectedVersion { get; } = new();
+    public ObservableCollection<TemplateOptionItemViewModel> TemplatesInSelectedVersion { get; } = new();
 
     [ObservableProperty]
     private bool _isLoadingTemplates;
@@ -93,6 +122,9 @@ public sealed partial class InstallsViewModel : LoggableViewModel
     public IAsyncRelayCommand InstallSelectedVersionCommand { get; }
 
     public bool ShowInstallButton => SelectedVersion is not null;
+
+    public string InstallButtonText
+        => IsSelectedVersionInstalled && _toolingStatus.IsWorkloadUpdateRecommended ? "Update Install" : "Install template";
 
     partial void OnSelectedVersionChanged(TemplateVersionInfo? value)
     {
@@ -311,7 +343,14 @@ public sealed partial class InstallsViewModel : LoggableViewModel
                 ct);
 
             foreach (var t in templates)
-                TemplatesInSelectedVersion.Add(t);
+            {
+                var required = _workloadRegistry.GetRequiredWorkloadId(t.TemplateId, t.Name);
+                var vm = new TemplateOptionItemViewModel(t.Name, t.TemplateId, version: string.Empty, requiredWorkload: required);
+                vm.UpdateWorkloadInstalled(!vm.RequiresWorkload || _workloadState.IsWorkloadInstalled(required ?? string.Empty));
+                TemplatesInSelectedVersion.Add(vm);
+            }
+
+            RefreshTemplateWorkloadBadges();
 
             Log($"Loaded {TemplatesInSelectedVersion.Count} template(s) for {selectedVersion}.");
         }
@@ -344,7 +383,23 @@ public sealed partial class InstallsViewModel : LoggableViewModel
             !string.IsNullOrWhiteSpace(InstalledTemplatePackVersion)
             && SelectedVersion.Version.Equals(InstalledTemplatePackVersion, StringComparison.OrdinalIgnoreCase);
 
-        CanInstallSelectedVersion = !IsSelectedVersionInstalled;
+        // Allow "Update Install" when the selected (installed) version is already installed,
+        // but workloads need updates or desired workloads are missing.
+        CanInstallSelectedVersion = !IsSelectedVersionInstalled || _toolingStatus.IsWorkloadUpdateRecommended;
+    }
+
+    private void RefreshTemplateWorkloadBadges()
+    {
+        foreach (var t in TemplatesInSelectedVersion)
+        {
+            if (!t.RequiresWorkload)
+            {
+                t.UpdateWorkloadInstalled(true);
+                continue;
+            }
+
+            t.UpdateWorkloadInstalled(_workloadState.IsWorkloadInstalled(t.RequiredWorkload ?? string.Empty));
+        }
     }
 
     private async Task InstallSelectedAsync()
@@ -357,28 +412,48 @@ public sealed partial class InstallsViewModel : LoggableViewModel
             return;
         }
 
-        if (IsSelectedVersionInstalled)
-        {
-            Log("Selected version is already installed.");
-            return;
-        }
+        // If the template version is already installed, this action becomes "Update Install" for workloads.
 
         var settings = _settingsStore.Load();
         var progress = new Progress<string>(Log);
 
         _templateState.SetTemplatePackageId(TemplatePackageId);
 
-        Log("Uninstalling existing templates (best-effort)...");
-        await _templates.UninstallAsync(TemplatePackageId, settings.NuGetPackagesFolder, progress, CancellationToken.None);
+        if (!IsSelectedVersionInstalled)
+        {
+            Log("Uninstalling existing templates (best-effort)...");
+            await _templates.UninstallAsync(TemplatePackageId, settings.NuGetPackagesFolder, progress, CancellationToken.None);
 
-        Log($"Installing {TemplatePackageId}::{SelectedVersion.Version} ...");
-        var exit = await _templates.InstallAsync(TemplatePackageId, SelectedVersion.Version, settings.NuGetPackagesFolder, progress, CancellationToken.None);
+            Log($"Installing {TemplatePackageId}::{SelectedVersion.Version} ...");
+            var exit = await _templates.InstallAsync(TemplatePackageId, SelectedVersion.Version, settings.NuGetPackagesFolder, progress, CancellationToken.None);
 
-        Log(exit == 0 ? "Install complete." : $"Install failed (exit {exit}).");
+            Log(exit == 0 ? "Install complete." : $"Install failed (exit {exit}).");
 
-        await RefreshInstalledVersionAsync();
+            await RefreshInstalledVersionAsync();
 
-        // Re-load templates from the selected version (should match installed).
-        await RefreshTemplatesForSelectedVersionAsync();
+            // Re-load templates from the selected version (should match installed).
+            await RefreshTemplatesForSelectedVersionAsync();
+        }
+
+        // Workload management (best-effort): install missing desired workloads, and/or update installed workloads.
+        var missingDesired = _workloadState.MissingDesiredWorkloads;
+        foreach (var workloadId in missingDesired)
+        {
+            Log($"Installing workload: {workloadId} ...");
+            var exit = await _workloadManager.InstallAsync(workloadId, progress, CancellationToken.None);
+            if (exit != 0)
+                Log($"Workload install failed for {workloadId} (exit {exit}).");
+        }
+
+        if (_workloadState.UpdatesAvailable)
+        {
+            Log("Updating workloads...");
+            var exitUpdate = await _workloadManager.UpdateAsync(progress, CancellationToken.None);
+            if (exitUpdate != 0)
+                Log($"Workload update failed (exit {exitUpdate}).");
+        }
+
+        await _workloadState.RefreshAsync(progress, CancellationToken.None);
+        RefreshTemplateWorkloadBadges();
     }
 }

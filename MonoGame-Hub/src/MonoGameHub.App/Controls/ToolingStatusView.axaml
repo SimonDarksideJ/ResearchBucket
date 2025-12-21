@@ -1,0 +1,15 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             x:Class="MonoGameHub.App.Controls.ToolingStatusView"
+             mc:Ignorable="d">
+
+  <StackPanel Orientation="Vertical" Spacing="0">
+    <TextBlock FontWeight="SemiBold" Text="{Binding InstalledLine}" />
+    <TextBlock Text="{Binding WorkloadsLine}"
+               Foreground="{Binding IsWorkloadUpdateRecommended, Converter={StaticResource ExistingProjectWarningForegroundConverter}}"
+               TextWrapping="Wrap" />
+  </StackPanel>
+
+</UserControl>

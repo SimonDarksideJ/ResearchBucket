@@ -14,8 +14,20 @@ public sealed partial class NewProjectViewModel : LoggableViewModel
     private readonly MonoGameToolingVersionSync _toolingVersionSync;
     private readonly OsLauncher _os;
     private readonly TemplatePackState _templateState;
+    private readonly DotNetWorkloadState _workloadState;
+    private readonly TemplateWorkloadRegistry _workloadRegistry;
+    private readonly ToolingSetupState _toolingStatus;
 
-    public NewProjectViewModel(SettingsStore settingsStore, DotNetCli dotnet, TemplateManager templates, MonoGameToolingVersionSync toolingVersionSync, OsLauncher os, TemplatePackState templateState)
+    public NewProjectViewModel(
+        SettingsStore settingsStore,
+        DotNetCli dotnet,
+        TemplateManager templates,
+        MonoGameToolingVersionSync toolingVersionSync,
+        OsLauncher os,
+        TemplatePackState templateState,
+        DotNetWorkloadState workloadState,
+        TemplateWorkloadRegistry workloadRegistry,
+        ToolingSetupState toolingStatus)
     {
         _settingsStore = settingsStore;
         _dotnet = dotnet;
@@ -23,6 +35,9 @@ public sealed partial class NewProjectViewModel : LoggableViewModel
         _toolingVersionSync = toolingVersionSync;
         _os = os;
         _templateState = templateState;
+        _workloadState = workloadState;
+        _workloadRegistry = workloadRegistry;
+        _toolingStatus = toolingStatus;
 
         CreateProjectCommand = new AsyncRelayCommand(CreateProjectAsync, CanCreateProject);
         RefreshTemplatesCommand = new AsyncRelayCommand(RefreshTemplatesAsync);
@@ -40,6 +55,15 @@ public sealed partial class NewProjectViewModel : LoggableViewModel
             else if (e.PropertyName == nameof(TemplatePackState.TemplatePackageId))
             {
                 _ = RefreshTemplatesAsync();
+            }
+        };
+
+        _workloadState.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(DotNetWorkloadState.InstalledWorkloads))
+            {
+                RefreshTemplateWorkloadBadges();
+                RefreshSelectedTemplateWorkloadWarning();
             }
         };
 
@@ -63,15 +87,17 @@ public sealed partial class NewProjectViewModel : LoggableViewModel
     [ObservableProperty]
     private string _templateShortName = "mgdesktopgl";
 
-    public ObservableCollection<TemplateInfo> TemplateOptions { get; } = new();
+    public ObservableCollection<TemplateOptionItemViewModel> TemplateOptions { get; } = new();
 
     [ObservableProperty]
-    private TemplateInfo? _selectedTemplate;
+    private TemplateOptionItemViewModel? _selectedTemplate;
 
     [ObservableProperty]
     private string _outputRoot = string.Empty;
 
     public string InstalledTemplatePackVersion => _templateState.InstalledTemplatePackVersion;
+
+    public ToolingSetupState ToolingStatus => _toolingStatus;
 
     [ObservableProperty]
     private bool _isLogExpanded;
@@ -84,6 +110,12 @@ public sealed partial class NewProjectViewModel : LoggableViewModel
 
     [ObservableProperty]
     private bool _isTemplatesLoading;
+
+    [ObservableProperty]
+    private bool _selectedTemplateMissingWorkload;
+
+    [ObservableProperty]
+    private string _selectedTemplateMissingWorkloadText = string.Empty;
 
     partial void OnProjectNameChanged(string value)
     {
@@ -135,6 +167,9 @@ public sealed partial class NewProjectViewModel : LoggableViewModel
     private bool CanCreateProject()
     {
         if (string.IsNullOrWhiteSpace(ProjectName))
+            return false;
+
+        if (SelectedTemplateMissingWorkload)
             return false;
 
         // Allow the user to click Create even when no output root is set yet;
@@ -197,7 +232,12 @@ public sealed partial class NewProjectViewModel : LoggableViewModel
                 CancellationToken.None);
 
             foreach (var t in templates)
-                TemplateOptions.Add(t);
+            {
+                var required = _workloadRegistry.GetRequiredWorkloadId(t.TemplateId, t.Name);
+                var vm = new TemplateOptionItemViewModel(t.Name, t.TemplateId, t.Version, required);
+                vm.UpdateWorkloadInstalled(!vm.RequiresWorkload || _workloadState.IsWorkloadInstalled(required ?? string.Empty));
+                TemplateOptions.Add(vm);
+            }
 
             // Re-select from the refreshed list using the current TemplateShortName.
             SelectedTemplate = TemplateOptions.FirstOrDefault(t => t.TemplateId.Equals(TemplateShortName, StringComparison.OrdinalIgnoreCase))
@@ -205,6 +245,10 @@ public sealed partial class NewProjectViewModel : LoggableViewModel
 
             if (SelectedTemplate is not null)
                 TemplateShortName = SelectedTemplate.TemplateId;
+
+            RefreshTemplateWorkloadBadges();
+            RefreshSelectedTemplateWorkloadWarning();
+            CreateProjectCommand.NotifyCanExecuteChanged();
 
             Log($"Loaded {TemplateOptions.Count} template(s).");
         }
@@ -221,10 +265,47 @@ public sealed partial class NewProjectViewModel : LoggableViewModel
 
     private int _refreshTemplatesInFlight;
 
-    partial void OnSelectedTemplateChanged(TemplateInfo? value)
+    partial void OnSelectedTemplateChanged(TemplateOptionItemViewModel? value)
     {
         if (value is not null)
             TemplateShortName = value.TemplateId;
+
+        RefreshSelectedTemplateWorkloadWarning();
+        CreateProjectCommand.NotifyCanExecuteChanged();
+    }
+
+    private void RefreshTemplateWorkloadBadges()
+    {
+        foreach (var t in TemplateOptions)
+        {
+            if (!t.RequiresWorkload)
+            {
+                t.UpdateWorkloadInstalled(true);
+                continue;
+            }
+
+            t.UpdateWorkloadInstalled(_workloadState.IsWorkloadInstalled(t.RequiredWorkload ?? string.Empty));
+        }
+    }
+
+    private void RefreshSelectedTemplateWorkloadWarning()
+    {
+        SelectedTemplateMissingWorkload = SelectedTemplate?.IsRequiredWorkloadMissing == true;
+        if (!SelectedTemplateMissingWorkload)
+        {
+            SelectedTemplateMissingWorkloadText = string.Empty;
+            return;
+        }
+
+        var required = SelectedTemplate?.RequiredWorkloadDisplay;
+        if (string.IsNullOrWhiteSpace(required))
+        {
+            SelectedTemplateMissingWorkloadText = "Selected template requires a workload that is not installed.";
+        }
+        else
+        {
+            SelectedTemplateMissingWorkloadText = $"Selected template requires workload '{required}' which is not installed.";
+        }
     }
 
     private async Task CreateProjectAsync()

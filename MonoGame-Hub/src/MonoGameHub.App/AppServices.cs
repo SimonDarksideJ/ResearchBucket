@@ -19,9 +19,12 @@ public static class AppServices
 
         services.AddSingleton<SettingsStore>();
         services.AddSingleton<DotNetCli>();
+        services.AddSingleton<DotNetWorkloadManager>();
+        services.AddSingleton<DotNetWorkloadState>();
         services.AddSingleton<NuGetVersionResolver>();
         services.AddSingleton<ProjectScanner>();
         services.AddSingleton<TemplateManager>();
+        services.AddSingleton<TemplateWorkloadRegistry>();
         services.AddSingleton<MonoGameToolingVersionSync>();
         services.AddSingleton<OsLauncher>();
 
@@ -30,6 +33,7 @@ public static class AppServices
         services.AddSingleton<MonoGameContentClient>();
 
         services.AddSingleton<TemplatePackState>();
+        services.AddSingleton<ToolingSetupState>();
 
         services.AddTransient<ProjectsViewModel>();
         services.AddTransient<InstallsViewModel>();

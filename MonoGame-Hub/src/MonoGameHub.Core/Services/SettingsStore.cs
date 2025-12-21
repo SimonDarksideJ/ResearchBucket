@@ -38,7 +38,11 @@ public sealed class SettingsStore
 
         if (!File.Exists(_settingsPath))
         {
-            _cached = new HubSettings() with { RecentProjects = Array.Empty<RecentProjectEntry>() };
+            _cached = new HubSettings() with
+            {
+                RecentProjects = Array.Empty<RecentProjectEntry>(),
+                DesiredWorkloads = Array.Empty<string>()
+            };
             _hasCache = true;
             return _cached;
         }
@@ -49,12 +53,18 @@ public sealed class SettingsStore
             _cached = JsonSerializer.Deserialize<HubSettings>(json, JsonOptions) ?? new HubSettings();
             if (_cached.RecentProjects is null)
                 _cached = _cached with { RecentProjects = Array.Empty<RecentProjectEntry>() };
+            if (_cached.DesiredWorkloads is null)
+                _cached = _cached with { DesiredWorkloads = Array.Empty<string>() };
             _hasCache = true;
             return _cached;
         }
         catch
         {
-            _cached = new HubSettings() with { RecentProjects = Array.Empty<RecentProjectEntry>() };
+            _cached = new HubSettings() with
+            {
+                RecentProjects = Array.Empty<RecentProjectEntry>(),
+                DesiredWorkloads = Array.Empty<string>()
+            };
             _hasCache = true;
             return _cached;
         }
@@ -72,7 +82,11 @@ public sealed class SettingsStore
             // Best-effort.
         }
 
-        _cached = new HubSettings() with { RecentProjects = Array.Empty<RecentProjectEntry>() };
+        _cached = new HubSettings() with
+        {
+            RecentProjects = Array.Empty<RecentProjectEntry>(),
+            DesiredWorkloads = Array.Empty<string>()
+        };
         _hasCache = true;
         SettingsChanged?.Invoke(this, _cached);
     }
@@ -110,7 +124,8 @@ public sealed record HubSettings(
     string ProjectsOrderingMode = "ProjectUpdated",
     bool SkipSplashScreen = false,
     int LastSeenBlogPostCount = 0,
-    IReadOnlyList<RecentProjectEntry>? RecentProjects = null);
+    IReadOnlyList<RecentProjectEntry>? RecentProjects = null,
+    IReadOnlyList<string>? DesiredWorkloads = null);
 
 public sealed record RecentProjectEntry(
     string ProjectPath,
