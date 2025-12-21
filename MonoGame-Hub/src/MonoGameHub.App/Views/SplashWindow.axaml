@@ -3,31 +3,49 @@
         x:Class="MonoGameHub.App.Views.SplashWindow"
         Width="560" Height="360"
         CanResize="False"
+        SystemDecorations="None"
         WindowStartupLocation="CenterScreen"
   Title="MonoGame Hub"
   Icon="avares://MonoGameHub.App/Assets/Branding/FullColorOnLight/LogoOnly.ico">
 
-  <Grid RowDefinitions="*,Auto" Margin="24">
+  <Grid PointerPressed="OnDragAreaPointerPressed">
 
-    <Grid Grid.Row="0">
-      <StackPanel Spacing="16" VerticalAlignment="Center" HorizontalAlignment="Center">
-        <Image Width="160" Height="160" Source="{Binding Logo}" Stretch="Uniform" />
-        <TextBlock HorizontalAlignment="Center" FontSize="20" FontWeight="SemiBold" Text="MonoGame Hub" />
-        <TextBlock HorizontalAlignment="Center" Classes="Muted" Text="Loading…" />
-      </StackPanel>
+    <Button HorizontalAlignment="Right"
+            VerticalAlignment="Top"
+            Margin="20"
+            Width="32"
+            Height="32"
+            Padding="0"
+            FontSize="16"
+          Background="Transparent"
+          BorderBrush="Transparent"
+          BorderThickness="0"
+            Content="✕"
+            Click="OnCloseButtonClick" />
+
+    <Grid RowDefinitions="*,Auto" Margin="24">
+
+      <Grid Grid.Row="0">
+        <StackPanel Spacing="16" VerticalAlignment="Center" HorizontalAlignment="Center">
+          <Image Width="160" Height="160" Source="{Binding Logo}" Stretch="Uniform" />
+          <TextBlock HorizontalAlignment="Center" FontSize="20" FontWeight="SemiBold" Text="MonoGame Hub" />
+          <TextBlock HorizontalAlignment="Center" Classes="Muted" Text="Loading…" />
+        </StackPanel>
+      </Grid>
+
+      <Border Grid.Row="1" Classes="Card" Padding="10" Margin="0,18,0,0" Height="{Binding LogPanelHeight}">
+        <ScrollViewer VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Disabled">
+          <ItemsControl ItemsSource="{Binding LogLines}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <TextBlock Text="{Binding}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" />
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+      </Border>
+
     </Grid>
-
-    <Border Grid.Row="1" Classes="Card" Padding="10" Margin="0,18,0,0" Height="{Binding LogPanelHeight}">
-      <ScrollViewer VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Disabled">
-        <ItemsControl ItemsSource="{Binding LogLines}">
-          <ItemsControl.ItemTemplate>
-            <DataTemplate>
-              <TextBlock Text="{Binding}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" />
-            </DataTemplate>
-          </ItemsControl.ItemTemplate>
-        </ItemsControl>
-      </ScrollViewer>
-    </Border>
 
   </Grid>
 </Window>

@@ -1,7 +1,6 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MonoGameHub.App.Services;
 using MonoGameHub.Core.Models;
 using MonoGameHub.Core.Services;
 
@@ -12,14 +11,16 @@ public sealed partial class NewProjectViewModel : LoggableViewModel
     private readonly SettingsStore _settingsStore;
     private readonly DotNetCli _dotnet;
     private readonly TemplateManager _templates;
+    private readonly MonoGameToolingVersionSync _toolingVersionSync;
     private readonly OsLauncher _os;
     private readonly TemplatePackState _templateState;
 
-    public NewProjectViewModel(SettingsStore settingsStore, DotNetCli dotnet, TemplateManager templates, OsLauncher os, TemplatePackState templateState)
+    public NewProjectViewModel(SettingsStore settingsStore, DotNetCli dotnet, TemplateManager templates, MonoGameToolingVersionSync toolingVersionSync, OsLauncher os, TemplatePackState templateState)
     {
         _settingsStore = settingsStore;
         _dotnet = dotnet;
         _templates = templates;
+        _toolingVersionSync = toolingVersionSync;
         _os = os;
         _templateState = templateState;
 
@@ -32,7 +33,14 @@ public sealed partial class NewProjectViewModel : LoggableViewModel
         _templateState.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(TemplatePackState.InstalledTemplatePackVersion))
+            {
                 OnPropertyChanged(nameof(InstalledTemplatePackVersion));
+                _ = RefreshTemplatesAsync();
+            }
+            else if (e.PropertyName == nameof(TemplatePackState.TemplatePackageId))
+            {
+                _ = RefreshTemplatesAsync();
+            }
         };
 
         // Best-effort load options.
@@ -50,7 +58,7 @@ public sealed partial class NewProjectViewModel : LoggableViewModel
     }
 
     [ObservableProperty]
-    private string _projectName = "MyMonoGameGame";
+    private string _projectName = string.Empty;
 
     [ObservableProperty]
     private string _templateShortName = "mgdesktopgl";
@@ -71,6 +79,12 @@ public sealed partial class NewProjectViewModel : LoggableViewModel
     [ObservableProperty]
     private bool _projectFolderAlreadyExists;
 
+    [ObservableProperty]
+    private bool _projectsRootMissingWarning;
+
+    [ObservableProperty]
+    private bool _isTemplatesLoading;
+
     partial void OnProjectNameChanged(string value)
     {
         RefreshProjectExistsState();
@@ -78,7 +92,23 @@ public sealed partial class NewProjectViewModel : LoggableViewModel
 
     partial void OnOutputRootChanged(string value)
     {
+        if (!string.IsNullOrWhiteSpace(value))
+            ProjectsRootMissingWarning = false;
+
         RefreshProjectExistsState();
+    }
+
+    public void SetAndPersistProjectsRoot(string folder)
+    {
+        if (string.IsNullOrWhiteSpace(folder))
+            return;
+
+        OutputRoot = folder;
+        ProjectsRootMissingWarning = false;
+
+        var current = _settingsStore.Load();
+        if (!string.Equals(current.ProjectsRoot ?? string.Empty, folder, StringComparison.Ordinal))
+            _settingsStore.Save(current with { ProjectsRoot = folder });
     }
 
     private void RefreshProjectExistsState()
@@ -107,7 +137,12 @@ public sealed partial class NewProjectViewModel : LoggableViewModel
         if (string.IsNullOrWhiteSpace(ProjectName))
             return false;
 
-        if (string.IsNullOrWhiteSpace(OutputRoot) || !Directory.Exists(OutputRoot))
+        // Allow the user to click Create even when no output root is set yet;
+        // the view will prompt for a folder and persist it.
+        if (string.IsNullOrWhiteSpace(OutputRoot))
+            return true;
+
+        if (!Directory.Exists(OutputRoot))
             return false;
 
         return !ProjectFolderAlreadyExists;
@@ -139,7 +174,16 @@ public sealed partial class NewProjectViewModel : LoggableViewModel
 
     private async Task RefreshTemplatesAsync()
     {
+        // Prevent overlapping refreshes (e.g. user clicks Refresh while a version-change refresh is already running).
+        if (Interlocked.Exchange(ref _refreshTemplatesInFlight, 1) == 1)
+            return;
+
+        IsTemplatesLoading = true;
         TemplateOptions.Clear();
+
+        // Ensure we don't keep a SelectedTemplate reference that no longer exists
+        // once we refresh the template list (e.g., when the installed template pack version changes).
+        SelectedTemplate = null;
 
         var settings = _settingsStore.Load();
         var progress = new Progress<string>(Log);
@@ -155,9 +199,9 @@ public sealed partial class NewProjectViewModel : LoggableViewModel
             foreach (var t in templates)
                 TemplateOptions.Add(t);
 
-            if (SelectedTemplate is null)
-                SelectedTemplate = TemplateOptions.FirstOrDefault(t => t.TemplateId.Equals(TemplateShortName, StringComparison.OrdinalIgnoreCase))
-                    ?? TemplateOptions.FirstOrDefault();
+            // Re-select from the refreshed list using the current TemplateShortName.
+            SelectedTemplate = TemplateOptions.FirstOrDefault(t => t.TemplateId.Equals(TemplateShortName, StringComparison.OrdinalIgnoreCase))
+                ?? TemplateOptions.FirstOrDefault();
 
             if (SelectedTemplate is not null)
                 TemplateShortName = SelectedTemplate.TemplateId;
@@ -168,7 +212,14 @@ public sealed partial class NewProjectViewModel : LoggableViewModel
         {
             Log($"Template load failed: {ex.Message}");
         }
+        finally
+        {
+            IsTemplatesLoading = false;
+            Interlocked.Exchange(ref _refreshTemplatesInFlight, 0);
+        }
     }
+
+    private int _refreshTemplatesInFlight;
 
     partial void OnSelectedTemplateChanged(TemplateInfo? value)
     {
@@ -179,6 +230,9 @@ public sealed partial class NewProjectViewModel : LoggableViewModel
     private async Task CreateProjectAsync()
     {
         IsLogExpanded = true;
+
+        if (string.IsNullOrWhiteSpace(OutputRoot))
+            ProjectsRootMissingWarning = true;
 
         RefreshProjectExistsState();
         if (ProjectFolderAlreadyExists)
@@ -224,21 +278,20 @@ public sealed partial class NewProjectViewModel : LoggableViewModel
             return;
         }
 
-        Log("Running dotnet restore...");
-        var exitRestore = await _dotnet.RunAsync(
-            new[] { "restore" },
-            workingDirectory: projectFolder,
-            environment: env,
-            output: progress,
-            cancellationToken: CancellationToken.None);
-
-        if (exitRestore != 0)
+        // Ensure MonoGame package versions in generated csproj(s) match the required dotnet tool version
+        // BEFORE running `dotnet tool restore` and `dotnet restore`.
+        try
         {
-            Log($"dotnet restore failed (exit {exitRestore}).");
-            return;
+            var didSync = _toolingVersionSync.TrySyncMonoGameVersionsToDotNetTools(projectFolder, Log);
+            if (didSync)
+                Log("Updated MonoGame package versions to match dotnet-tools.");
+        }
+        catch (Exception ex)
+        {
+            Log($"MonoGame version sync failed: {ex.Message}");
         }
 
-        // If the template uses dotnet tools (common for older tooling setups), restore them.
+        // If the template uses dotnet tools (common for older tooling setups), restore them first.
         var toolsManifest = Path.Combine(projectFolder, ".config", "dotnet-tools.json");
         if (File.Exists(toolsManifest))
         {
@@ -255,6 +308,20 @@ public sealed partial class NewProjectViewModel : LoggableViewModel
                 Log($"dotnet tool restore failed (exit {exitToolRestore}).");
                 return;
             }
+        }
+
+        Log("Running dotnet restore...");
+        var exitRestore = await _dotnet.RunAsync(
+            new[] { "restore" },
+            workingDirectory: projectFolder,
+            environment: env,
+            output: progress,
+            cancellationToken: CancellationToken.None);
+
+        if (exitRestore != 0)
+        {
+            Log($"dotnet restore failed (exit {exitRestore}).");
+            return;
         }
 
         Log("Project created and restored.");

@@ -17,7 +17,9 @@
       <Grid Grid.Row="0" RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto">
         <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Spacing="8" Margin="0,0,0,8">
           <TextBlock Width="110" VerticalAlignment="Center" Text="Project name" />
-          <TextBox Width="340" Text="{Binding ProjectName, Mode=TwoWay}"
+          <TextBox Width="340"
+                   Watermark="MyMonoGameGame"
+                   Text="{Binding ProjectName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                    Background="{Binding ProjectFolderAlreadyExists, Converter={StaticResource ExistingProjectWarningBackgroundConverter}}"
                    BorderBrush="{Binding ProjectFolderAlreadyExists, Converter={StaticResource ExistingProjectWarningForegroundConverter}}" />
         </StackPanel>
@@ -33,7 +35,7 @@
             <TextBlock FontWeight="SemiBold" Text="{Binding InstalledTemplatePackVersion}" />
           </StackPanel>
 
-          <Button Content="Create project" Command="{Binding CreateProjectCommand}" />
+          <Button Content="Create project" Command="{Binding CreateProjectCommand}" Click="OnCreateProjectClicked" />
         </StackPanel>
 
         <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="8">
@@ -55,38 +57,46 @@
             <TextBlock Grid.Column="2" Text="Version" FontWeight="Bold" Margin="12,0,0,0" MaxWidth="140" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" />
           </Grid>
 
-          <ListBox Grid.Row="2"
-                  ItemsSource="{Binding TemplateOptions}"
-                  SelectedItem="{Binding SelectedTemplate, Mode=TwoWay}"
-                  HorizontalAlignment="Stretch"
-                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-            <ListBox.ItemsPanel>
-              <ItemsPanelTemplate>
-                <VirtualizingStackPanel HorizontalAlignment="Stretch" />
-              </ItemsPanelTemplate>
-            </ListBox.ItemsPanel>
-            <ListBox.Styles>
-              <Style Selector="ListBoxItem">
-                <Setter Property="HorizontalAlignment" Value="Stretch" />
-                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-              </Style>
-            </ListBox.Styles>
-            <ListBox.ItemTemplate>
-              <DataTemplate>
-                <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto,Auto" Margin="2" HorizontalAlignment="Stretch">
-                  <TextBlock Grid.Row="0" Grid.ColumnSpan="3" Text="{Binding Name}" TextWrapping="Wrap" TextTrimming="None" />
+          <Grid Grid.Row="2">
+            <ListBox ItemsSource="{Binding TemplateOptions}"
+                    SelectedItem="{Binding SelectedTemplate, Mode=TwoWay}"
+                    HorizontalAlignment="Stretch"
+                    ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+              <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <VirtualizingStackPanel HorizontalAlignment="Stretch" />
+                </ItemsPanelTemplate>
+              </ListBox.ItemsPanel>
+              <ListBox.Styles>
+                <Style Selector="ListBoxItem">
+                  <Setter Property="HorizontalAlignment" Value="Stretch" />
+                  <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                </Style>
+              </ListBox.Styles>
+              <ListBox.ItemTemplate>
+                <DataTemplate>
+                  <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto,Auto" Margin="2" HorizontalAlignment="Stretch">
+                    <TextBlock Grid.Row="0" Grid.ColumnSpan="3" Text="{Binding Name}" TextWrapping="Wrap" TextTrimming="None" />
 
-                  <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding TemplateId}" Opacity="0.8" Margin="12,2,0,0" MaxWidth="320" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Right" />
-                  <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Version}" Opacity="0.8" Margin="12,2,0,0" MaxWidth="140" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Right" />
-                </Grid>
-              </DataTemplate>
-            </ListBox.ItemTemplate>
-          </ListBox>
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding TemplateId}" Opacity="0.8" Margin="12,2,0,0" MaxWidth="320" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Right" />
+                    <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Version}" Opacity="0.8" Margin="12,2,0,0" MaxWidth="140" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Right" />
+                  </Grid>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+
+            <TextBlock Text="Loading templates..."
+                       Opacity="0.8"
+                       IsHitTestVisible="False"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       IsVisible="{Binding IsTemplatesLoading}" />
+          </Grid>
         </Grid>
       </Border>
 
       <!-- Footer (15%) -->
-      <Grid Grid.Row="2" RowDefinitions="Auto,Auto">
+      <Grid Grid.Row="2" RowDefinitions="Auto,Auto,Auto">
         <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8" Margin="0,0,0,8">
           <TextBlock Width="110" VerticalAlignment="Center" Text="Output root" />
           <Grid ColumnDefinitions="Auto,Auto">
@@ -95,7 +105,12 @@
           </Grid>
         </StackPanel>
 
-        <TextBlock Grid.Row="1" Opacity="0.7" Text="Templates are loaded from your installed dotnet template packages (MonoGame filtered by default)." />
+        <TextBlock Grid.Row="1" Margin="110,0,0,8" Opacity="0.9"
+                   IsVisible="{Binding ProjectsRootMissingWarning}"
+                   Foreground="{Binding ProjectsRootMissingWarning, Converter={StaticResource ExistingProjectWarningForegroundConverter}}"
+                   Text="Projects folder is not set. Choose an output root to continue." />
+
+        <TextBlock Grid.Row="2" Opacity="0.7" Text="Templates are loaded from your installed dotnet template packages (MonoGame filtered by default)." />
       </Grid>
 
     </Grid>

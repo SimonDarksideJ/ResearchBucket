@@ -1,6 +1,6 @@
 ﻿using Avalonia;
 using MonoGameHub.App;
-using MonoGameHub.App.Services;
+using MonoGameHub.Core.Services;
 
 internal static class Program
 {
@@ -8,11 +8,9 @@ internal static class Program
 	public static void Main(string[] args)
 	{
 		// Debug/testing option:
-		//  - ClearCache
 		//  - --clearCache
 		StartupOptions.ClearCacheRequested = args.Any(a =>
-			a.Equals("ClearCache", StringComparison.OrdinalIgnoreCase)
-			|| a.Equals("--clearCache", StringComparison.OrdinalIgnoreCase));
+			a.Equals("--clearCache", StringComparison.OrdinalIgnoreCase));
 
 		BuildAvaloniaApp()
 			.StartWithClassicDesktopLifetime(args);

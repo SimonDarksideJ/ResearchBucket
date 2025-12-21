@@ -12,6 +12,28 @@ public sealed partial class NewProjectView : UserControl
         InitializeComponent();
     }
 
+    private async void OnCreateProjectClicked(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not NewProjectViewModel vm)
+            return;
+
+        // If the default projects folder isn't configured yet, prompt for it.
+        if (string.IsNullOrWhiteSpace(vm.OutputRoot))
+        {
+            vm.ProjectsRootMissingWarning = true;
+            e.Handled = true;
+
+            var selected = await PickFolderAsync(null, "Select projects folder");
+            if (string.IsNullOrWhiteSpace(selected))
+                return;
+
+            vm.SetAndPersistProjectsRoot(selected);
+
+            if (vm.CreateProjectCommand.CanExecute(null))
+                await vm.CreateProjectCommand.ExecuteAsync(null);
+        }
+    }
+
     private async void OnBrowseOutputRootClicked(object? sender, RoutedEventArgs e)
     {
         if (DataContext is not NewProjectViewModel vm)

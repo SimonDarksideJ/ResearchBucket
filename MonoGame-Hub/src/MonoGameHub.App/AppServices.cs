@@ -22,6 +22,7 @@ public static class AppServices
         services.AddSingleton<NuGetVersionResolver>();
         services.AddSingleton<ProjectScanner>();
         services.AddSingleton<TemplateManager>();
+        services.AddSingleton<MonoGameToolingVersionSync>();
         services.AddSingleton<OsLauncher>();
 
         services.AddSingleton<HttpClient>();
@@ -36,7 +37,7 @@ public static class AppServices
         services.AddTransient<SettingsViewModel>();
         services.AddTransient<BlogViewModel>();
         services.AddTransient<ResourcesViewModel>();
-        services.AddSingleton<DocsSiteCache>();
+        services.AddSingleton<MonoGameHub.Core.Services.DocsSiteCache>();
         services.AddTransient<DocsApiViewModel>();
         services.AddTransient<MainWindowViewModel>();
 

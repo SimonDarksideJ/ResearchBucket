@@ -6,8 +6,8 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Documents;
 using Avalonia.Markup.Xaml;
-using MonoGameHub.App.Models;
 using MonoGameHub.App.ViewModels;
+using MonoGameHub.Core.Models;
 
 namespace MonoGameHub.App.Controls;
 

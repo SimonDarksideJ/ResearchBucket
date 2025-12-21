@@ -17,6 +17,10 @@ public sealed class SettingsStore
 
     public event EventHandler<HubSettings>? SettingsChanged;
 
+    public bool SettingsFileExists => File.Exists(_settingsPath);
+
+    public string SettingsFilePath => _settingsPath;
+
     public SettingsStore()
     {
         var baseDir = Path.Combine(
@@ -56,10 +60,38 @@ public sealed class SettingsStore
         }
     }
 
+    public void Clear()
+    {
+        try
+        {
+            if (File.Exists(_settingsPath))
+                File.Delete(_settingsPath);
+        }
+        catch
+        {
+            // Best-effort.
+        }
+
+        _cached = new HubSettings() with { RecentProjects = Array.Empty<RecentProjectEntry>() };
+        _hasCache = true;
+        SettingsChanged?.Invoke(this, _cached);
+    }
+
     public void Save(HubSettings settings)
     {
         if (_hasCache && Equals(_cached, settings))
             return;
+
+        try
+        {
+            var dir = Path.GetDirectoryName(_settingsPath);
+            if (!string.IsNullOrWhiteSpace(dir))
+                Directory.CreateDirectory(dir);
+        }
+        catch
+        {
+            // Best-effort.
+        }
 
         var json = JsonSerializer.Serialize(settings, JsonOptions);
         File.WriteAllText(_settingsPath, json);

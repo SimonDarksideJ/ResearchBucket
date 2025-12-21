@@ -2,7 +2,8 @@ using System.Collections.ObjectModel;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MonoGameHub.App.Services;
+using MonoGameHub.Core.Models;
+using MonoGameHub.Core.Services;
 
 namespace MonoGameHub.App.ViewModels;
 
@@ -107,7 +108,11 @@ public sealed partial class DocsApiViewModel : ViewModelBase
     {
         var version = Interlocked.Increment(ref _tocReloadVersion);
 
-        var toc = await _docs.GetTocAsync(SelectedMode, CancellationToken.None);
+        var tocModels = await _docs.GetTocAsync(SelectedMode, CancellationToken.None);
+
+        var toc = tocModels
+            .Select(TocNodeViewModel.FromModel)
+            .ToList();
 
         if (version != Volatile.Read(ref _tocReloadVersion))
             return;
@@ -243,3 +248,4 @@ public sealed partial class DocsApiViewModel : ViewModelBase
         return null;
     }
 }
+

@@ -1,4 +1,4 @@
-namespace MonoGameHub.App.Models;
+namespace MonoGameHub.Core.Models;
 
 public abstract record DocsPageBlock;
 

@@ -1,17 +1,10 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using System.Collections.ObjectModel;
-using CommunityToolkit.Mvvm.ComponentModel;
 using HtmlAgilityPack;
+using MonoGameHub.Core.Models;
 
-namespace MonoGameHub.App.Services;
-
-public enum DocsSiteMode
-{
-    Docs,
-    Api
-}
+namespace MonoGameHub.Core.Services;
 
 public sealed class DocsSiteCache
 {
@@ -34,7 +27,7 @@ public sealed class DocsSiteCache
         Directory.CreateDirectory(_cacheRoot);
     }
 
-    public async Task<IReadOnlyList<TocNodeViewModel>> GetTocAsync(DocsSiteMode mode, CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<DocsTocNode>> GetTocAsync(DocsSiteMode mode, CancellationToken cancellationToken)
     {
         var tocPath = Path.Combine(_cacheRoot, mode == DocsSiteMode.Docs ? "toc-docs.json" : "toc-api.json");
 
@@ -45,10 +38,10 @@ public sealed class DocsSiteCache
             if (File.Exists(tocPath))
                 return LoadTocFromDisk(tocPath);
 
-            return Array.Empty<TocNodeViewModel>();
+            return Array.Empty<DocsTocNode>();
         }
 
-        IReadOnlyList<TocNodeViewModel> toc;
+        IReadOnlyList<DocsTocNode> toc;
 
         if (mode == DocsSiteMode.Docs)
         {
@@ -124,25 +117,25 @@ public sealed class DocsSiteCache
         }
     }
 
-    private static IReadOnlyList<TocNodeViewModel> LoadTocFromDisk(string tocPath)
+    private static IReadOnlyList<DocsTocNode> LoadTocFromDisk(string tocPath)
     {
         try
         {
             var json = File.ReadAllText(tocPath);
-            var dto = JsonSerializer.Deserialize<List<TocNodeDto>>(json, JsonOptions) ?? new();
-            return dto.Select(TocNodeViewModel.FromDto).ToList();
+            var dto = JsonSerializer.Deserialize<List<DocsTocNodeDto>>(json, JsonOptions) ?? new();
+            return dto.Select(FromDto).ToList();
         }
         catch
         {
-            return Array.Empty<TocNodeViewModel>();
+            return Array.Empty<DocsTocNode>();
         }
     }
 
-    private static void SaveTocToDisk(string tocPath, IReadOnlyList<TocNodeViewModel> toc)
+    private static void SaveTocToDisk(string tocPath, IReadOnlyList<DocsTocNode> toc)
     {
         try
         {
-            var dto = toc.Select(TocNodeViewModel.ToDto).ToList();
+            var dto = toc.Select(ToDto).ToList();
             var json = JsonSerializer.Serialize(dto, JsonOptions);
             File.WriteAllText(tocPath, json);
         }
@@ -152,7 +145,30 @@ public sealed class DocsSiteCache
         }
     }
 
-    private static IReadOnlyList<TocNodeViewModel> ParseDocsToc(string html, Uri baseUri)
+    private static DocsTocNodeDto ToDto(DocsTocNode node)
+        => new(node.Title, node.Url?.ToString(), node.FullTitle, node.Children.Select(ToDto).ToList());
+
+    private static DocsTocNode FromDto(DocsTocNodeDto dto)
+    {
+        Uri? url = null;
+        if (!string.IsNullOrWhiteSpace(dto.Url) && Uri.TryCreate(dto.Url, UriKind.Absolute, out var parsed))
+            url = parsed;
+
+        var node = new DocsTocNode(dto.Title, url)
+        {
+            FullTitle = string.IsNullOrWhiteSpace(dto.FullTitle) ? dto.Title : dto.FullTitle
+        };
+
+        if (dto.Children is not null)
+        {
+            foreach (var child in dto.Children)
+                node.Children.Add(FromDto(child));
+        }
+
+        return node;
+    }
+
+    private static IReadOnlyList<DocsTocNode> ParseDocsToc(string html, Uri baseUri)
     {
         var doc = new HtmlDocument();
         doc.LoadHtml(html);
@@ -166,11 +182,11 @@ public sealed class DocsSiteCache
                  ?? doc.DocumentNode.SelectSingleNode("//ul[contains(@class,'nav')]");
 
         return ul is null
-            ? Array.Empty<TocNodeViewModel>()
+            ? Array.Empty<DocsTocNode>()
             : ParseNestedList(ul, baseUri);
     }
 
-    private static IReadOnlyList<TocNodeViewModel> ParseApiToc(string html)
+    private static IReadOnlyList<DocsTocNode> ParseApiToc(string html)
     {
         var doc = new HtmlDocument();
         doc.LoadHtml(html);
@@ -188,7 +204,7 @@ public sealed class DocsSiteCache
             .ToList() ?? new();
 
         // Normalize to absolute urls and build a tree based on dot-separated segments.
-        var roots = new Dictionary<string, TocNodeViewModel>(StringComparer.OrdinalIgnoreCase);
+        var roots = new Dictionary<string, DocsTocNode>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var link in links)
         {
@@ -217,7 +233,7 @@ public sealed class DocsSiteCache
         return t.Trim('.');
     }
 
-    private static void AddBySegments(Dictionary<string, TocNodeViewModel> roots, string[] segments, Uri url, string fullTitle)
+    private static void AddBySegments(Dictionary<string, DocsTocNode> roots, string[] segments, Uri url, string fullTitle)
     {
         if (segments.Length == 0)
             return;
@@ -225,7 +241,7 @@ public sealed class DocsSiteCache
         var key = segments[0];
         if (!roots.TryGetValue(key, out var node))
         {
-            node = new TocNodeViewModel(segments[0], null);
+            node = new DocsTocNode(segments[0], null);
             roots[key] = node;
         }
 
@@ -236,7 +252,7 @@ public sealed class DocsSiteCache
             var existing = current.Children.FirstOrDefault(c => string.Equals(c.Title, seg, StringComparison.OrdinalIgnoreCase));
             if (existing is null)
             {
-                existing = new TocNodeViewModel(seg, null);
+                existing = new DocsTocNode(seg, null);
                 current.Children.Add(existing);
             }
 
@@ -248,9 +264,9 @@ public sealed class DocsSiteCache
         current.FullTitle = fullTitle;
     }
 
-    private static IReadOnlyList<TocNodeViewModel> ParseNestedList(HtmlNode ul, Uri baseUri)
+    private static IReadOnlyList<DocsTocNode> ParseNestedList(HtmlNode ul, Uri baseUri)
     {
-        var results = new List<TocNodeViewModel>();
+        var results = new List<DocsTocNode>();
         var liNodes = ul.SelectNodes("./li") ?? new HtmlNodeCollection(ul);
 
         foreach (var li in liNodes)
@@ -268,7 +284,7 @@ public sealed class DocsSiteCache
             if (!string.IsNullOrWhiteSpace(href) && Uri.TryCreate(baseUri, href, out var absolute))
                 url = absolute;
 
-            var node = new TocNodeViewModel(text, url);
+            var node = new DocsTocNode(text, url);
 
             var childUl = li.SelectSingleNode("./ul") ?? li.SelectSingleNode(".//ul");
             if (childUl is not null)
@@ -723,84 +739,5 @@ public sealed class DocsSiteCache
         WriteIndented = false
     };
 
-    public sealed record TocNodeDto(string Title, string? Url, List<TocNodeDto>? Children);
-}
-
-public sealed partial class TocNodeViewModel : ObservableObject
-{
-    public TocNodeViewModel(string title, Uri? url)
-    {
-        Title = title;
-        Url = url;
-        FullTitle = title;
-    }
-
-    public string Title { get; }
-
-    [ObservableProperty]
-    private Uri? _url;
-
-    // Used for API where leaf title may be a full dotted name.
-    [ObservableProperty]
-    private string _fullTitle;
-
-    [ObservableProperty]
-    private bool _isExpanded;
-
-    public ObservableCollection<TocNodeViewModel> Children { get; } = new();
-
-    public void SetExpandedRecursive(bool expanded)
-    {
-        IsExpanded = expanded;
-        foreach (var child in Children)
-            child.SetExpandedRecursive(expanded);
-    }
-
-    public TocNodeViewModel? Filter(string filter)
-    {
-        if (string.IsNullOrWhiteSpace(filter))
-            return this;
-
-        var contains = Title.Contains(filter, StringComparison.OrdinalIgnoreCase)
-                       || FullTitle.Contains(filter, StringComparison.OrdinalIgnoreCase);
-
-        var filteredChildren = Children
-            .Select(c => c.Filter(filter))
-            .Where(c => c is not null)
-            .Select(c => c!)
-            .ToList();
-
-        if (!contains && filteredChildren.Count == 0)
-            return null;
-
-        var clone = new TocNodeViewModel(Title, Url)
-        {
-            FullTitle = FullTitle
-        };
-
-        foreach (var child in filteredChildren)
-            clone.Children.Add(child);
-
-        return clone;
-    }
-
-    public static DocsSiteCache.TocNodeDto ToDto(TocNodeViewModel node)
-        => new(node.Title, node.Url?.ToString(), node.Children.Select(ToDto).ToList());
-
-    public static TocNodeViewModel FromDto(DocsSiteCache.TocNodeDto dto)
-    {
-        Uri? url = null;
-        if (!string.IsNullOrWhiteSpace(dto.Url) && Uri.TryCreate(dto.Url, UriKind.Absolute, out var parsed))
-            url = parsed;
-
-        var node = new TocNodeViewModel(dto.Title, url);
-
-        if (dto.Children is not null)
-        {
-            foreach (var child in dto.Children)
-                node.Children.Add(FromDto(child));
-        }
-
-        return node;
-    }
+    private sealed record DocsTocNodeDto(string Title, string? Url, string? FullTitle, List<DocsTocNodeDto>? Children);
 }

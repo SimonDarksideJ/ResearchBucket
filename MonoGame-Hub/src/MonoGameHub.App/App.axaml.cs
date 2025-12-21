@@ -1,4 +1,5 @@
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
@@ -32,30 +33,14 @@ public sealed partial class App : Application
         {
             var settingsStore = AppServices.Services.GetRequiredService<SettingsStore>();
 
-            // Testing/debug option to reset cached state.
-            var forceClearCache = StartupOptions.ClearCacheRequested || StartupOptions.AlwaysClearCacheInDev;
-            if (forceClearCache)
+            // Debug/testing option to reset cached state.
+            // Note: AlwaysClearCacheInDev is intended for local debugging only.
+            if (StartupOptions.ClearCacheRequested || StartupOptions.AlwaysClearCacheInDev)
             {
-                var current = settingsStore.Load();
-                // Use -1 as a sentinel to force a "new" announcement toast on next startup check.
-                settingsStore.Save(current with { LastSeenBlogPostCount = -1 });
-
-                AppLogBus.Publish(StartupOptions.AlwaysClearCacheInDev
-                    ? "Dev: AlwaysClearCacheInDev enabled; reset announcement cache."
-                    : "ClearCache: reset announcement cache.");
-
-                AppAnnouncementBus.Clear();
-
-                // Also clear in-memory content caches (best-effort).
-                try
-                {
-                    AppServices.Services.GetRequiredService<MonoGameContentClient>().InvalidateCache();
-                }
-                catch
-                {
-                    // Ignore.
-                }
+                CleanCache(settingsStore, AppServices.Services);
             }
+
+            EnsureDefaultNuGetPackagesFolderOnFirstLaunch(settingsStore);
 
             var settings = settingsStore.Load();
             if (settings.SkipSplashScreen)
@@ -106,17 +91,33 @@ public sealed partial class App : Application
                 DataContext = splashVm
             };
 
+            var isTransitioningToMainWindow = false;
+            EventHandler<WindowClosingEventArgs>? splashClosingHandler = null;
+            splashClosingHandler = (_, _) =>
+            {
+                if (isTransitioningToMainWindow)
+                    return;
+
+                StartupOptions.AbortStartupRequested = true;
+                desktop.Shutdown();
+            };
+
+            splash.Closing += splashClosingHandler;
+
             desktop.MainWindow = splash;
 
             // Keep UX snappy: show splash immediately, then build the main window while it is visible.
             Dispatcher.UIThread.Post(async () =>
             {
+                if (StartupOptions.AbortStartupRequested)
+                    return;
+
                 var timer = Stopwatch.StartNew();
 
                 // High-level splash hints (these will be followed by detailed logs from the real work).
-                AppLogBus.Publish("Getting MonoGame dotnet templates...");
-                AppLogBus.Publish("Getting the latest news...");
-                AppLogBus.Publish("Searching for new resources...");
+                LogBus.Publish("Getting MonoGame dotnet templates...");
+                LogBus.Publish("Getting the latest news...");
+                LogBus.Publish("Searching for new resources...");
 
                 // Best-effort: check for new announcements while the splash is visible.
                 var announcementTask = TryCheckAnnouncementAsync(AppServices.Services, settingsStore);
@@ -161,12 +162,20 @@ public sealed partial class App : Application
                 {
                 }
 
+                if (StartupOptions.AbortStartupRequested)
+                    return;
+
                 // Ensure the splash is visible long enough to be meaningful.
                 // Announcements now remain visible until the splash closes, so no extra time is needed.
                 var remaining = MinSplashStartTime - timer.Elapsed;
                 if (remaining > TimeSpan.Zero)
                     await Task.Delay(remaining);
 
+                if (StartupOptions.AbortStartupRequested)
+                    return;
+
+                isTransitioningToMainWindow = true;
+                splash.Closing -= splashClosingHandler;
                 desktop.MainWindow = mainWindow;
                 mainWindow.Show();
                 splash.Close();
@@ -176,11 +185,93 @@ public sealed partial class App : Application
         base.OnFrameworkInitializationCompleted();
     }
 
+    private static void EnsureDefaultNuGetPackagesFolderOnFirstLaunch(SettingsStore settingsStore)
+    {
+        // First launch is defined as: no settings file yet.
+        if (settingsStore.SettingsFileExists)
+            return;
+
+        // If the user has explicitly configured NuGet's global-packages folder via env var,
+        // don't override it with an app setting.
+        var env = Environment.GetEnvironmentVariable("NUGET_PACKAGES")
+            ?? Environment.GetEnvironmentVariable("NUGET_PACKAGES", EnvironmentVariableTarget.User)
+            ?? Environment.GetEnvironmentVariable("NUGET_PACKAGES", EnvironmentVariableTarget.Machine);
+
+        if (!string.IsNullOrWhiteSpace(env))
+            return;
+
+        var userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        if (string.IsNullOrWhiteSpace(userProfile))
+            return;
+
+        var defaultGlobalPackagesFolder = Path.Combine(userProfile, ".nuget", "packages");
+
+        var current = settingsStore.Load();
+        if (!string.IsNullOrWhiteSpace(current.NuGetPackagesFolder))
+            return;
+
+        settingsStore.Save(current with { NuGetPackagesFolder = defaultGlobalPackagesFolder });
+        LogBus.Publish($"First launch: defaulted NuGet packages folder to {defaultGlobalPackagesFolder}");
+    }
+
+    private static void CleanCache(SettingsStore settingsStore, IServiceProvider services)
+    {
+        LogBus.Publish("ClearCache: clearing caches and settings...");
+
+        // Full reset: delete the entire %AppData%\MonoGameHub folder (settings + cache + any other persisted state).
+        try
+        {
+            var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            var expectedBaseDir = Path.Combine(appData, "MonoGameHub");
+
+            var settingsDir = Path.GetDirectoryName(settingsStore.SettingsFilePath);
+            if (!string.IsNullOrWhiteSpace(settingsDir)
+                && string.Equals(
+                    Path.GetFullPath(settingsDir).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar),
+                    Path.GetFullPath(expectedBaseDir).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar),
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                if (Directory.Exists(settingsDir))
+                    Directory.Delete(settingsDir, recursive: true);
+
+                // Recreate base directory so subsequent SettingsStore.Save calls have a valid path.
+                Directory.CreateDirectory(settingsDir);
+            }
+        }
+        catch
+        {
+            // Best-effort.
+        }
+
+        // Reset in-memory settings cache to defaults.
+        settingsStore.Clear();
+
+        AppAnnouncementBus.Clear();
+
+        try
+        {
+            services.GetRequiredService<MonoGameContentClient>().InvalidateCache();
+        }
+        catch
+        {
+            // Ignore.
+        }
+
+        try
+        {
+            services.GetRequiredService<TemplatePackState>().ReloadFromSettings();
+        }
+        catch
+        {
+            // Ignore.
+        }
+    }
+
     private static async Task<(bool IsNew, BlogPost? Post, IImage? Thumbnail)> TryCheckAnnouncementAsync(IServiceProvider services, SettingsStore settingsStore)
     {
         try
         {
-            AppLogBus.Publish("Checking announcements...");
+            LogBus.Publish("Checking announcements...");
 
             var content = services.GetRequiredService<MonoGameContentClient>();
             var images = services.GetRequiredService<RemoteImageLoader>();
@@ -235,3 +326,4 @@ public sealed partial class App : Application
         }
     }
 }
+

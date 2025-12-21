@@ -6,8 +6,8 @@ using Avalonia.Platform;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MonoGameHub.App.Services;
 using MonoGameHub.Core.Models;
+using MonoGameHub.Core.Services;
 
 namespace MonoGameHub.App.ViewModels;
 
@@ -29,10 +29,10 @@ public sealed partial class SplashViewModel : ViewModelBase
 
         LogPanelHeight = SplashLogPadding + (SplashLogVisibleLines * SplashLogLineHeight);
 
-        foreach (var line in AppLogBus.GetHistorySnapshot())
+        foreach (var line in LogBus.GetHistorySnapshot())
             AppendLine(line);
 
-        AppLogBus.Line += OnLine;
+        LogBus.Line += OnLine;
 
         OpenAnnouncementCommand = new RelayCommand<string>(OpenAnnouncement);
     }
@@ -103,7 +103,7 @@ public sealed partial class SplashViewModel : ViewModelBase
 
     public void Dispose()
     {
-        AppLogBus.Line -= OnLine;
+        LogBus.Line -= OnLine;
     }
 
     public async Task ShowAnnouncementAsync(BlogPost post, IImage? thumbnail)

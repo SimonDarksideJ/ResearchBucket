@@ -1,6 +1,6 @@
 using System.Collections.ObjectModel;
 using Avalonia.Threading;
-using MonoGameHub.App.Services;
+using MonoGameHub.Core.Services;
 
 namespace MonoGameHub.App.ViewModels;
 
@@ -13,7 +13,7 @@ public abstract class LoggableViewModel : ViewModelBase
         if (string.IsNullOrWhiteSpace(line))
             return;
 
-        AppLogBus.Publish(line);
+        LogBus.Publish(line);
 
         void AddLine()
         {
@@ -30,3 +30,4 @@ public abstract class LoggableViewModel : ViewModelBase
             Dispatcher.UIThread.Post(AddLine);
     }
 }
+

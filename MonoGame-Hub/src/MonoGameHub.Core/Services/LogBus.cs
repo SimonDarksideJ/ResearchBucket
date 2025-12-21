@@ -1,8 +1,6 @@
-using System.Collections.Generic;
+namespace MonoGameHub.Core.Services;
 
-namespace MonoGameHub.App.Services;
-
-public static class AppLogBus
+public static class LogBus
 {
     private static readonly object Gate = new();
     private static readonly List<string> HistoryInternal = new();
