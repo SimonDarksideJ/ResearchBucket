@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "dgSpecHash": "zH67jEePbvA=",
+  "success": true,
+  "projectFilePath": "C:\\LD\\00-Personal\\ResearchBucket\\MonoGame-Hub\\src\\MonoGameHub.Core\\MonoGameHub.Core.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\SimonJackson\\.nuget\\packages\\htmlagilitypack\\1.11.42\\htmlagilitypack.1.11.42.nupkg.sha512",
+    "C:\\Users\\SimonJackson\\.nuget\\packages\\newtonsoft.json\\13.0.3\\newtonsoft.json.13.0.3.nupkg.sha512",
+    "C:\\Users\\SimonJackson\\.nuget\\packages\\nuget.common\\6.14.0\\nuget.common.6.14.0.nupkg.sha512",
+    "C:\\Users\\SimonJackson\\.nuget\\packages\\nuget.configuration\\6.14.0\\nuget.configuration.6.14.0.nupkg.sha512",
+    "C:\\Users\\SimonJackson\\.nuget\\packages\\nuget.frameworks\\6.14.0\\nuget.frameworks.6.14.0.nupkg.sha512",
+    "C:\\Users\\SimonJackson\\.nuget\\packages\\nuget.packaging\\6.14.0\\nuget.packaging.6.14.0.nupkg.sha512",
+    "C:\\Users\\SimonJackson\\.nuget\\packages\\nuget.protocol\\6.14.0\\nuget.protocol.6.14.0.nupkg.sha512",
+    "C:\\Users\\SimonJackson\\.nuget\\packages\\nuget.versioning\\6.14.0\\nuget.versioning.6.14.0.nupkg.sha512",
+    "C:\\Users\\SimonJackson\\.nuget\\packages\\system.security.cryptography.pkcs\\6.0.4\\system.security.cryptography.pkcs.6.0.4.nupkg.sha512",
+    "C:\\Users\\SimonJackson\\.nuget\\packages\\system.security.cryptography.protecteddata\\4.4.0\\system.security.cryptography.protecteddata.4.4.0.nupkg.sha512"
+  ],
+  "logs": []
+}

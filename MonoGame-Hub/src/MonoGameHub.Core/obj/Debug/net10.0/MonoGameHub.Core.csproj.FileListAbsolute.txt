@@ -1,0 +1,13 @@
+C:\LD\00-Personal\ResearchBucket\MonoGame-Hub\src\MonoGameHub.Core\bin\Debug\net10.0\MonoGameHub.Core.deps.json
+C:\LD\00-Personal\ResearchBucket\MonoGame-Hub\src\MonoGameHub.Core\bin\Debug\net10.0\MonoGameHub.Core.dll
+C:\LD\00-Personal\ResearchBucket\MonoGame-Hub\src\MonoGameHub.Core\bin\Debug\net10.0\MonoGameHub.Core.pdb
+C:\LD\00-Personal\ResearchBucket\MonoGame-Hub\src\MonoGameHub.Core\obj\Debug\net10.0\MonoGameHub.Core.csproj.AssemblyReference.cache
+C:\LD\00-Personal\ResearchBucket\MonoGame-Hub\src\MonoGameHub.Core\obj\Debug\net10.0\MonoGameHub.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\LD\00-Personal\ResearchBucket\MonoGame-Hub\src\MonoGameHub.Core\obj\Debug\net10.0\MonoGameHub.Core.AssemblyInfoInputs.cache
+C:\LD\00-Personal\ResearchBucket\MonoGame-Hub\src\MonoGameHub.Core\obj\Debug\net10.0\MonoGameHub.Core.AssemblyInfo.cs
+C:\LD\00-Personal\ResearchBucket\MonoGame-Hub\src\MonoGameHub.Core\obj\Debug\net10.0\MonoGameHub.Core.csproj.CoreCompileInputs.cache
+C:\LD\00-Personal\ResearchBucket\MonoGame-Hub\src\MonoGameHub.Core\obj\Debug\net10.0\MonoGameHub.Core.sourcelink.json
+C:\LD\00-Personal\ResearchBucket\MonoGame-Hub\src\MonoGameHub.Core\obj\Debug\net10.0\MonoGameHub.Core.dll
+C:\LD\00-Personal\ResearchBucket\MonoGame-Hub\src\MonoGameHub.Core\obj\Debug\net10.0\refint\MonoGameHub.Core.dll
+C:\LD\00-Personal\ResearchBucket\MonoGame-Hub\src\MonoGameHub.Core\obj\Debug\net10.0\MonoGameHub.Core.pdb
+C:\LD\00-Personal\ResearchBucket\MonoGame-Hub\src\MonoGameHub.Core\obj\Debug\net10.0\ref\MonoGameHub.Core.dll
