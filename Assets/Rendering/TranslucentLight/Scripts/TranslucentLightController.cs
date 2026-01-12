@@ -75,6 +75,10 @@ namespace ResearchBucket.Rendering.TranslucentLight
         [Tooltip("Fresnel intensity")]
         public float fresnelIntensity = 1f;
         
+        [Header("Manager Settings")]
+        [Tooltip("Automatically register with TranslucentLightManager (if present)")]
+        public bool registerWithManager = true;
+        
         #endregion
         
         #region Private Fields
@@ -110,6 +114,12 @@ namespace ResearchBucket.Rendering.TranslucentLight
         {
             UpdateShaderProperties();
             
+            // Register with manager if desired
+            if (registerWithManager)
+            {
+                TranslucentLightManager.Instance.RegisterLight(this);
+            }
+            
             if (autoPulse)
             {
                 StartAutoPulse();
@@ -131,6 +141,12 @@ namespace ResearchBucket.Rendering.TranslucentLight
         
         private void OnDestroy()
         {
+            // Unregister from manager
+            if (registerWithManager && TranslucentLightManager.Instance != null)
+            {
+                TranslucentLightManager.Instance.UnregisterLight(this);
+            }
+            
             // Clean up material instance
             if (materialInstance != null)
             {
