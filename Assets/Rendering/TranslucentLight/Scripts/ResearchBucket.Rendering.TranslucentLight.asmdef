@@ -1,0 +1,14 @@
+{
+    "name": "ResearchBucket.Rendering.TranslucentLight",
+    "rootNamespace": "ResearchBucket.Rendering.TranslucentLight",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

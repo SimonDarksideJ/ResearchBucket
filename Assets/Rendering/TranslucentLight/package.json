@@ -1,0 +1,28 @@
+{
+  "name": "com.researchbucket.rendering.translucentlight",
+  "version": "1.0.0",
+  "displayName": "Translucent Light Shader",
+  "description": "A high-performance, mobile-optimized shader effect system for Unity URP. Creates beautiful translucent light effects with pulsing and breathing animations. Designed for 100+ concurrent instances on mobile devices.",
+  "unity": "6000.0",
+  "unityRelease": "0f1",
+  "keywords": [
+    "shader",
+    "urp",
+    "mobile",
+    "translucent",
+    "light",
+    "glow",
+    "emission",
+    "pulse",
+    "breathing",
+    "effect",
+    "rendering"
+  ],
+  "author": {
+    "name": "ResearchBucket Team"
+  },
+  "category": "Rendering",
+  "dependencies": {
+    "com.unity.render-pipelines.universal": "14.0.0"
+  }
+}
