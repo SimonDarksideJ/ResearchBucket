@@ -190,7 +190,11 @@ namespace ResearchBucket.Rendering.TranslucentLight
                         return customGradient;
                     }
                     // Fallback to cyan-blue if custom not set
-                    goto case GradientPreset.CyanBlue;
+                    colors = new GradientColorKey[] {
+                        new GradientColorKey(new Color(0f, 1f, 1f), 0f),
+                        new GradientColorKey(new Color(0f, 0.5f, 1f), 1f)
+                    };
+                    break;
                     
                 default:
                     colors = new GradientColorKey[] {

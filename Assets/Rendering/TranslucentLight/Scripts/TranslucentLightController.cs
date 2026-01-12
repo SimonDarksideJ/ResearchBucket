@@ -278,7 +278,15 @@ namespace ResearchBucket.Rendering.TranslucentLight
         /// </summary>
         public void SetColorGradient(Gradient gradient)
         {
-            colorGradient = gradient;
+            if (gradient == null)
+            {
+                Debug.LogWarning("Attempted to set null gradient. Using default gradient instead.", this);
+                colorGradient = CreateDefaultGradient();
+            }
+            else
+            {
+                colorGradient = gradient;
+            }
             UpdateShaderProperties();
         }
         
@@ -421,7 +429,7 @@ namespace ResearchBucket.Rendering.TranslucentLight
                 elapsed += Time.deltaTime;
                 float t = elapsed / breathDuration;
                 
-                // Smooth sine wave for breathing (using slerp concept)
+                // Smooth sine wave for breathing (linear interpolation with sinusoidal curve)
                 float intensity = Mathf.Lerp(1f, breathMaxIntensity, 
                     (Mathf.Sin(t * Mathf.PI * 2f - Mathf.PI / 2f) + 1f) / 2f);
                 

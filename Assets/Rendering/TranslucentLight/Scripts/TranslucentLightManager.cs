@@ -220,12 +220,11 @@ namespace ResearchBucket.Rendering.TranslucentLight
                     currentUpdateIndex = 0;
                 }
                 
-                var controller = registeredControllers[currentUpdateIndex];
-                if (controller != null && controller.enabled)
-                {
-                    // Batch update logic can be implemented here
-                    // For now, individual controllers handle their own updates
-                }
+                // Note: Individual controllers handle their own updates via coroutines.
+                // This batch system is primarily for future enhancements like
+                // synchronized effects or LOD-based update rates.
+                // Current implementation relies on Unity's coroutine scheduling
+                // which already provides good distribution of work.
                 
                 currentUpdateIndex++;
             }

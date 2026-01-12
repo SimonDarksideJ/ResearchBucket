@@ -36,11 +36,6 @@ Shader "Custom/URP/TranslucentLight"
             #pragma fragment frag
             #pragma target 3.0
             
-            // URP keywords for mobile optimization
-            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
-            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
-            #pragma multi_compile_fragment _ _SHADOWS_SOFT
-            
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
             

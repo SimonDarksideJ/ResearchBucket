@@ -43,7 +43,7 @@ A comprehensive MonoBehaviour component that provides:
   - Auto-repeat with configurable interval (default: 1 second)
   - Configurable duration (0.1-5 seconds)
   - Intensity multiplier (0-10x)
-  - Sine wave-based smooth animation (slerp concept)
+  - Sine wave-based smooth animation for rhythmic effect
 
 #### Management Features
 - **Material Instancing**: Automatic per-object material creation
