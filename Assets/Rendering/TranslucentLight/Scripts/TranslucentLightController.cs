@@ -429,7 +429,7 @@ namespace ResearchBucket.Rendering.TranslucentLight
                 elapsed += Time.deltaTime;
                 float t = elapsed / breathDuration;
                 
-                // Smooth sine wave for breathing (linear interpolation with sinusoidal curve)
+                // Sinusoidal modulation for smooth breathing effect
                 float intensity = Mathf.Lerp(1f, breathMaxIntensity, 
                     (Mathf.Sin(t * Mathf.PI * 2f - Mathf.PI / 2f) + 1f) / 2f);
                 

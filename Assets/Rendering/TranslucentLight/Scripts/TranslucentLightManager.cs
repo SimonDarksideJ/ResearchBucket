@@ -75,9 +75,12 @@ namespace ResearchBucket.Rendering.TranslucentLight
         
         private void Update()
         {
-            // Reserved for future batch update implementation
-            // Currently, individual controllers manage their own updates efficiently
-            // via Unity's coroutine system
+            // Currently individual controllers manage their own updates via Unity's coroutine system.
+            // The manager provides global operations (PulseAll, BreathAll, SetGlobalGradient) and
+            // tracks registered lights for statistics. Future enhancements could include:
+            // - LOD-based update rates for distant lights
+            // - Synchronized effects across multiple lights
+            // - Staggered animation starts to reduce frame spikes
         }
         
         #endregion
@@ -197,19 +200,6 @@ namespace ResearchBucket.Rendering.TranslucentLight
         #endregion
         
         #region Private Methods
-        
-        private void UpdateLightsBatch()
-        {
-            // Note: The batch update system is currently a framework for future enhancements.
-            // Individual controllers manage their own updates via Unity's coroutine system,
-            // which provides good work distribution. Future versions could add:
-            // - LOD-based update rates (distant lights update less frequently)
-            // - Synchronized effects across multiple lights
-            // - Staggered animation starts to reduce frame spikes
-            
-            // The registered lights list is maintained for global operations like
-            // PulseAll(), BreathAll(), and SetGlobalGradient()
-        }
         
         private void UpdateStatistics()
         {
