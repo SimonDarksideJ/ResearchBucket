@@ -57,8 +57,6 @@ namespace ResearchBucket.Rendering.TranslucentLight
         #region Private Fields
         
         private List<TranslucentLightController> registeredControllers = new List<TranslucentLightController>();
-        private float timeSinceLastUpdate = 0f;
-        private int currentUpdateIndex = 0;
         
         #endregion
         
@@ -77,16 +75,9 @@ namespace ResearchBucket.Rendering.TranslucentLight
         
         private void Update()
         {
-            if (!enableBatching) return;
-            
-            timeSinceLastUpdate += Time.deltaTime;
-            float updateInterval = 1f / targetUpdateRate;
-            
-            if (timeSinceLastUpdate >= updateInterval)
-            {
-                timeSinceLastUpdate = 0f;
-                UpdateLightsBatch();
-            }
+            // Reserved for future batch update implementation
+            // Currently, individual controllers manage their own updates efficiently
+            // via Unity's coroutine system
         }
         
         #endregion
@@ -209,25 +200,15 @@ namespace ResearchBucket.Rendering.TranslucentLight
         
         private void UpdateLightsBatch()
         {
-            if (registeredControllers.Count == 0) return;
+            // Note: The batch update system is currently a framework for future enhancements.
+            // Individual controllers manage their own updates via Unity's coroutine system,
+            // which provides good work distribution. Future versions could add:
+            // - LOD-based update rates (distant lights update less frequently)
+            // - Synchronized effects across multiple lights
+            // - Staggered animation starts to reduce frame spikes
             
-            int lightsToUpdate = Mathf.Min(maxLightsPerFrame, registeredControllers.Count);
-            
-            for (int i = 0; i < lightsToUpdate; i++)
-            {
-                if (currentUpdateIndex >= registeredControllers.Count)
-                {
-                    currentUpdateIndex = 0;
-                }
-                
-                // Note: Individual controllers handle their own updates via coroutines.
-                // This batch system is primarily for future enhancements like
-                // synchronized effects or LOD-based update rates.
-                // Current implementation relies on Unity's coroutine scheduling
-                // which already provides good distribution of work.
-                
-                currentUpdateIndex++;
-            }
+            // The registered lights list is maintained for global operations like
+            // PulseAll(), BreathAll(), and SetGlobalGradient()
         }
         
         private void UpdateStatistics()

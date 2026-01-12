@@ -13,7 +13,7 @@ A high-performance, mobile-optimized shader effect system for Unity 6000.3 (LTS)
 
 ### Animation Features
 - ⚡ **Pulse Effect** - Quick burst of light from the core
-- 🫁 **Breathing Effect** - Smooth, rhythmic intensity variation using slerp
+- 🫁 **Breathing Effect** - Smooth, rhythmic intensity variation with sine wave
 - 🔄 **Auto-Repeat** - Configurable automatic pulse/breathe cycles
 - 🎛️ **Manual Control** - Trigger effects on demand via code or inspector
 
