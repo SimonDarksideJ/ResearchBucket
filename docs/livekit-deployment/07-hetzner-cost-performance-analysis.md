@@ -1,8 +1,10 @@
-# LiveKit on Hetzner: Cost and Performance Analysis
+# LiveKit on Hetzner: Cost and Performance Analysis (Audio-Only Solution)
 
 ## Executive Summary
 
-This document provides a comprehensive cost and performance breakdown for deploying LiveKit on Hetzner infrastructure, specifically focused on container deployments. It includes detailed calculations for session costs, bandwidth requirements, capacity planning, and server sizing recommendations.
+This document provides a comprehensive cost and performance breakdown for deploying LiveKit on Hetzner infrastructure for **AUDIO-ONLY** conferencing sessions, specifically focused on container deployments. It includes detailed calculations for session costs, bandwidth requirements, capacity planning, and server sizing recommendations.
+
+**Important Note:** This analysis is for audio-only conferencing with no video streams. Video conferencing would require significantly different bandwidth and resource calculations.
 
 ## Table of Contents
 
@@ -23,45 +25,43 @@ This document provides a comprehensive cost and performance breakdown for deploy
 **Session Parameters:**
 - **Participants:** 8 people
 - **Duration:** 10 minutes
-- **Video Quality:** Standard (720p @ 30fps)
 - **Audio:** Opus codec (64 kbps per stream)
+- **Video:** None (audio-only conferencing)
 
 ### Bandwidth Requirements per Session
 
 #### Per Participant Bandwidth
 
-**Video Stream (720p):**
-- Bitrate: ~1.5 Mbps (typical for 720p @ 30fps with VP8/H.264)
-- Each participant sends: 1.5 Mbps
-- Each participant receives: 7 × 1.5 Mbps = 10.5 Mbps (all other participants)
-- Total per participant: 12 Mbps
-
-**Audio Stream:**
+**Audio Stream Only:**
 - Bitrate: 64 kbps per stream
 - Each participant sends: 64 kbps
 - Each participant receives: 7 × 64 kbps = 448 kbps
 - Total per participant: 512 kbps (~0.5 Mbps)
 
-**Total Bandwidth per Participant:** ~12.5 Mbps
+**Note:** Video has been excluded from this analysis as this is an audio-only solution.
 
 #### Server-Side Bandwidth (SFU Architecture)
 
-In LiveKit's SFU (Selective Forwarding Unit) architecture:
+In LiveKit's SFU (Selective Forwarding Unit) architecture for audio-only:
 
-- **Ingress (receiving from participants):** 8 × (1.5 Mbps video + 0.064 Mbps audio) = 8 × 1.564 Mbps = 12.512 Mbps
-- **Egress (sending to participants):** 8 × (7 × 1.5 Mbps video + 7 × 0.064 Mbps audio) = 8 × 10.948 Mbps = 87.584 Mbps
-- **Total Session Bandwidth:** ~100 Mbps
+- **Ingress (receiving from participants):** 8 × 0.064 Mbps = 0.512 Mbps
+- **Egress (sending to participants):** 8 × (7 × 0.064 Mbps) = 8 × 0.448 Mbps = 3.584 Mbps
+- **Total Session Bandwidth:** ~4 Mbps
+
+**Key Difference:** Audio-only requires approximately 25× less bandwidth than audio+video sessions.
 
 #### Data Transfer per Session
 
 For a 10-minute session:
 - Duration: 600 seconds
-- Total data: (100 Mbps × 600 seconds) / 8 = 7,500 MB = **~7.5 GB**
+- Total data: (4 Mbps × 600 seconds) / 8 = 300 MB = **~0.3 GB**
 
 **Breakdown:**
-- Ingress: ~0.94 GB
-- Egress: ~6.56 GB
-- Total: ~7.5 GB per 10-minute session
+- Ingress: ~0.038 GB
+- Egress: ~0.262 GB
+- Total: ~0.3 GB per 10-minute audio-only session
+
+**Comparison:** This is 25× less data than video+audio sessions (which would use ~7.5 GB).
 
 ### Cost per Session
 
@@ -85,6 +85,8 @@ For a **Hetzner CCX23** server (4 vCPU, 16GB RAM, €36.51/month):
 - Time fraction: 10 minutes / 43,800 minutes = 0.0228%
 - Session cost: €36.51 × 0.000228 = **€0.0083** (~$0.009 USD)
 
+**Note:** For audio-only, the server time cost remains the same, but CPU/memory usage is significantly lower, allowing many more concurrent sessions per server.
+
 ### Total Single Session Cost
 
 **Direct Costs:**
@@ -92,7 +94,7 @@ For a **Hetzner CCX23** server (4 vCPU, 16GB RAM, €36.51/month):
 - Bandwidth: €0 (included in free tier)
 - **Total: €0.0083 (~$0.009 USD) per session**
 
-**Note:** This assumes efficient utilization. Actual cost is lower with multiple concurrent sessions.
+**Note:** This assumes efficient utilization. Actual cost is significantly lower with multiple concurrent sessions. Audio-only sessions use minimal resources compared to video, allowing much higher concurrency.
 
 ---
 
@@ -103,38 +105,40 @@ For a **Hetzner CCX23** server (4 vCPU, 16GB RAM, €36.51/month):
 #### Scenario: 100 Sessions per Day
 
 **Daily bandwidth:**
-- 100 sessions × 7.5 GB = 750 GB/day
+- 100 sessions × 0.3 GB = 30 GB/day
 
 **Monthly bandwidth:**
-- 750 GB/day × 30 days = 22.5 TB/month
+- 30 GB/day × 30 days = 900 GB/month (~0.9 TB/month)
 
 **Hetzner bandwidth:**
 - Included: 1 TB/month
-- Required: 22.5 TB/month
-- **Overage: 21.5 TB** (typically included for free by Hetzner)
+- Required: 0.9 TB/month
+- **Result: Fully covered by included bandwidth**
 
 #### Impact to Host
 
 **Network Utilization:**
 - Peak concurrent sessions: Depends on timing
-- Average network load: 22.5 TB / 730 hours = 31 GB/hour = **~69 Mbps average**
-- Peak load (10 concurrent sessions): **~1 Gbps**
+- Average network load: 0.9 TB / 730 hours = 1.23 GB/hour = **~2.7 Mbps average**
+- Peak load (100 concurrent sessions): **~400 Mbps**
 
-**Server Impact:**
-- CPU usage per session: ~15-25% of one core (8 participants)
-- Memory per session: ~200-400 MB
-- Network I/O: Primary bottleneck at scale
+**Server Impact (Audio-Only):**
+- CPU usage per session: ~2-5% of one core (8 participants, audio only)
+- Memory per session: ~50-100 MB
+- Network I/O: Minimal compared to video - no longer a bottleneck
+- **Primary advantage: CPU and memory usage is dramatically lower without video encoding/decoding**
 
 ### Bandwidth Cost Scenarios
 
 | Sessions/Day | Data/Month | Hetzner Cost | AWS Cost (estimate) | GCP Cost (estimate) |
 |--------------|------------|--------------|---------------------|---------------------|
-| 10 | 2.25 TB | €0 (included) | $205 | $184 |
-| 50 | 11.25 TB | €0 (included) | $1,025 | $920 |
-| 100 | 22.5 TB | €0 (included) | $2,050 | $1,840 |
-| 500 | 112.5 TB | €0 (included) | $10,250 | $9,200 |
+| 100 | 0.9 TB | €0 (included) | $82 | $74 |
+| 500 | 4.5 TB | €0 (included) | $410 | $368 |
+| 1,000 | 9 TB | €0 (included) | $820 | $736 |
+| 5,000 | 45 TB | €0 (included) | $4,100 | $3,680 |
+| 10,000 | 90 TB | €0 (included) | $8,200 | $7,360 |
 
-**Note:** Hetzner's generous bandwidth policy significantly reduces costs compared to major cloud providers.
+**Note:** Hetzner's generous bandwidth policy significantly reduces costs compared to major cloud providers. Audio-only sessions use 25× less bandwidth than video sessions, making even high-volume deployments easily manageable.
 
 ---
 
@@ -144,35 +148,39 @@ For a **Hetzner CCX23** server (4 vCPU, 16GB RAM, €36.51/month):
 
 #### Hetzner CCX23 (4 vCPU, 16GB RAM) - €36.51/month
 
-**Theoretical Capacity:**
-- CPU-limited: ~12-16 concurrent sessions (at 25% CPU per session)
-- Memory-limited: ~40 concurrent sessions (at 400MB per session)
-- Network-limited: ~10 concurrent sessions (at 100 Mbps per session with 1 Gbps NIC)
-- **Practical capacity: 8-10 concurrent sessions**
+**Theoretical Capacity (Audio-Only):**
+- CPU-limited: ~80-100 concurrent sessions (at 2-5% CPU per session)
+- Memory-limited: ~160 concurrent sessions (at 100MB per session)
+- Network-limited: ~250 concurrent sessions (at 4 Mbps per session with 1 Gbps NIC)
+- **Practical capacity: 60-80 concurrent sessions** (with safety margin)
 
 **Daily Session Capacity (with headroom):**
 - Average session duration: 10 minutes
-- Sessions per hour: 8 servers × 6 sessions = 48 sessions/hour
-- Daily capacity: 48 × 24 = **1,152 sessions/day**
+- Sessions per hour: 60 sessions × 6 sessions = 360 sessions/hour
+- Daily capacity: 360 × 24 = **8,640 sessions/day**
 
 **With 30% Spike Headroom:**
-- Reserved capacity: 70% × 8 = 5.6 concurrent sessions
-- Spike capacity: 30% buffer = 2.4 sessions
-- **Recommended limit: 5-6 concurrent sessions** to handle spikes
+- Reserved capacity: 70% × 80 = 56 concurrent sessions
+- Spike capacity: 30% buffer = 24 sessions
+- **Recommended limit: 50-60 concurrent sessions** to handle spikes
+
+**Key Advantage:** Audio-only allows 6-8× more concurrent sessions than video due to minimal CPU, memory, and bandwidth requirements.
 
 #### Adjusted Daily Capacity with Headroom
 
-- Concurrent capacity: 5 sessions
-- Sessions per hour: 5 × 6 = 30 sessions/hour
-- Daily capacity: 30 × 24 = **720 sessions/day**
-- Monthly capacity: 720 × 30 = **21,600 sessions/month**
+- Concurrent capacity: 60 sessions
+- Sessions per hour: 60 × 6 = 360 sessions/hour
+- Daily capacity: 360 × 24 = **8,640 sessions/day**
+- Monthly capacity: 8,640 × 30 = **259,200 sessions/month**
 
 ### Cost per Session at Scale
 
 **At 70% utilization:**
 - Monthly cost: €36.51
-- Monthly sessions: 21,600
-- **Cost per session: €0.00169 (~$0.0018 USD)**
+- Monthly sessions: 259,200
+- **Cost per session: €0.00014 (~$0.00015 USD)**
+
+**Comparison:** Audio-only sessions cost approximately 12× less per session than video sessions at scale due to much higher server capacity.
 
 ---
 
@@ -183,10 +191,12 @@ For a **Hetzner CCX23** server (4 vCPU, 16GB RAM, €36.51/month):
 #### Scenario: Scaling Beyond Single Host
 
 **When to scale:**
-- Consistently >6 concurrent sessions
-- Peak usage >8 concurrent sessions
+- Consistently >60 concurrent sessions
+- Peak usage >80 concurrent sessions
 - Geographic distribution requirements
 - Redundancy/high availability needs
+
+**Note:** For audio-only, a single CCX23 server can handle significantly more load than video sessions, delaying the need for multi-host scaling.
 
 #### Two-Server Architecture
 
@@ -203,11 +213,11 @@ For a **Hetzner CCX23** server (4 vCPU, 16GB RAM, €36.51/month):
 - **Total: ~€83-98/month**
 
 **Capacity:**
-- Concurrent sessions: 10-12 (with headroom)
-- Daily sessions: ~1,440
-- Monthly sessions: ~43,200
+- Concurrent sessions: 120-160 (with headroom)
+- Daily sessions: ~17,280
+- Monthly sessions: ~518,400
 
-**Cost per session:** €0.00192-€0.00227 (~$0.002-$0.0025 USD)
+**Cost per session:** €0.00014-€0.00016 (~$0.00015-$0.00017 USD)
 
 #### Three-Server Architecture
 
@@ -223,11 +233,11 @@ For a **Hetzner CCX23** server (4 vCPU, 16GB RAM, €36.51/month):
 - **Total: ~€125-135/month**
 
 **Capacity:**
-- Concurrent sessions: 15-18 (with headroom)
-- Daily sessions: ~2,160
-- Monthly sessions: ~64,800
+- Concurrent sessions: 180-240 (with headroom)
+- Daily sessions: ~25,920
+- Monthly sessions: ~777,600
 
-**Cost per session:** €0.00193-€0.00208 (~$0.002-$0.0023 USD)
+**Cost per session:** €0.00014-€0.00017 (~$0.00015-$0.00018 USD)
 
 ### Additional Requirements for Multi-Host
 
@@ -271,62 +281,64 @@ For a **Hetzner CCX23** server (4 vCPU, 16GB RAM, €36.51/month):
 
 ## Server Sizing Matrix
 
-### Hetzner Cloud Server Options
+### Hetzner Cloud Server Options (Audio-Only Performance)
 
 | Server Type | vCPU | RAM | Price/Month | Concurrent Sessions* | Sessions/Day** | Monthly Sessions | Cost/Session |
 |-------------|------|-----|-------------|---------------------|----------------|------------------|--------------|
-| **CX21** | 2 | 4GB | €5.83 | 2-3 | 288-432 | 8,640-12,960 | €0.00045-€0.00067 |
-| **CX31** | 2 | 8GB | €10.50 | 3-4 | 432-576 | 12,960-17,280 | €0.00061-€0.00081 |
-| **CX41** | 4 | 16GB | €21.00 | 6-8 | 864-1,152 | 25,920-34,560 | €0.00061-€0.00081 |
-| **CCX23** | 4 | 16GB | €36.51 | 8-10 | 1,152-1,440 | 34,560-43,200 | €0.00085-€0.00106 |
-| **CCX33** | 8 | 32GB | €73.02 | 16-20 | 2,304-2,880 | 69,120-86,400 | €0.00085-€0.00106 |
-| **CCX43** | 16 | 64GB | €146.04 | 30-35 | 4,320-5,040 | 129,600-151,200 | €0.00097-€0.00113 |
-| **CCX53** | 32 | 128GB | €292.08 | 50-60 | 7,200-8,640 | 216,000-259,200 | €0.00113-€0.00135 |
+| **CX21** | 2 | 4GB | €5.83 | 20-25 | 2,880-3,600 | 86,400-108,000 | €0.000054-€0.000067 |
+| **CX31** | 2 | 8GB | €10.50 | 25-35 | 3,600-5,040 | 108,000-151,200 | €0.000069-€0.000097 |
+| **CX41** | 4 | 16GB | €21.00 | 50-70 | 7,200-10,080 | 216,000-302,400 | €0.000069-€0.000097 |
+| **CCX23** | 4 | 16GB | €36.51 | 60-80 | 8,640-11,520 | 259,200-345,600 | €0.000106-€0.000141 |
+| **CCX33** | 8 | 32GB | €73.02 | 120-160 | 17,280-23,040 | 518,400-691,200 | €0.000106-€0.000141 |
+| **CCX43** | 16 | 64GB | €146.04 | 240-320 | 34,560-46,080 | 1,036,800-1,382,400 | €0.000106-€0.000141 |
+| **CCX53** | 32 | 128GB | €292.08 | 400-500 | 57,600-72,000 | 1,728,000-2,160,000 | €0.000135-€0.000169 |
 
-*With 30% headroom for spikes  
+*With 30% headroom for spikes (audio-only workload)
 **Assuming 10-minute sessions, 6 per hour
+
+**Key Insight:** Audio-only sessions allow 6-10× higher concurrency per server compared to video sessions, dramatically improving cost efficiency.
 
 ### Recommended Configurations by Use Case
 
-#### Startup / MVP (< 100 sessions/day)
+#### Startup / MVP (< 1,000 sessions/day)
 
 **Recommendation:** Hetzner CX21
 - Cost: €5.83/month
-- Capacity: 288 sessions/day
-- Cost per session: €0.00045
+- Capacity: 2,880 sessions/day
+- Cost per session: €0.000054
 - **Total monthly cost: ~€6-10** (including overhead)
 
-#### Small Business (100-500 sessions/day)
+#### Small Business (1,000-5,000 sessions/day)
 
-**Recommendation:** Hetzner CX41
-- Cost: €21.00/month
-- Capacity: 864 sessions/day
-- Cost per session: €0.00061
-- **Total monthly cost: ~€25-30**
+**Recommendation:** Hetzner CX31 or CX41
+- Cost: €10.50-21.00/month
+- Capacity: 3,600-10,080 sessions/day
+- Cost per session: €0.000069-€0.000097
+- **Total monthly cost: ~€15-25**
 
-#### Growing Business (500-1,000 sessions/day)
+#### Growing Business (5,000-10,000 sessions/day)
 
 **Recommendation:** Hetzner CCX23
 - Cost: €36.51/month
-- Capacity: 1,152 sessions/day
-- Cost per session: €0.00085
+- Capacity: 8,640-11,520 sessions/day
+- Cost per session: €0.000106-€0.000141
 - **Total monthly cost: ~€40-50**
 
-#### Medium Scale (1,000-3,000 sessions/day)
+#### Medium Scale (10,000-30,000 sessions/day)
 
-**Recommendation:** 2× Hetzner CCX23 or 1× CCX33
+**Recommendation:** 1× Hetzner CCX33 or 2× CCX23
 - Cost: €73.02-83/month
-- Capacity: 2,304-2,880 sessions/day
-- Cost per session: €0.00085-€0.00192
-- **Total monthly cost: ~€80-100**
+- Capacity: 17,280-23,040 sessions/day
+- Cost per session: €0.000106-€0.000141
+- **Total monthly cost: ~€75-100**
 
-#### Large Scale (3,000+ sessions/day)
+#### Large Scale (30,000+ sessions/day)
 
 **Recommendation:** Multiple CCX33 or CCX43 servers
 - Cost: Varies by configuration
-- Capacity: 4,000+ sessions/day
+- Capacity: 30,000+ sessions/day
 - Requires proper load balancing and auto-scaling
-- **Total monthly cost: €150-500+**
+- **Total monthly cost: €150-400+**
 
 ---
 
@@ -334,7 +346,7 @@ For a **Hetzner CCX23** server (4 vCPU, 16GB RAM, €36.51/month):
 
 ### One Large Server vs Multiple Small Servers
 
-#### Scenario Comparison: 2,000 Sessions/Day
+#### Scenario Comparison: 20,000 Sessions/Day (Audio-Only)
 
 **Option A: One Large Server (CCX43)**
 
@@ -351,16 +363,15 @@ For a **Hetzner CCX23** server (4 vCPU, 16GB RAM, €36.51/month):
 
 **Disadvantages:**
 - Single point of failure
-- Bandwidth bottleneck: 1 Gbps shared
 - Limited geographic distribution
 - No horizontal scalability
-- Network becomes bottleneck before CPU
 
-**Bandwidth Analysis:**
-- Peak concurrent: 30 sessions
-- Peak bandwidth: 30 × 100 Mbps = 3 Gbps required
-- **Network limited: Maximum ~10 concurrent sessions reliably**
-- Actual capacity: ~1,440 sessions/day (not 4,320)
+**Capacity Analysis:**
+- Peak concurrent: ~250 sessions (audio-only)
+- Peak bandwidth: 250 × 4 Mbps = 1,000 Mbps (at capacity)
+- CPU utilization: ~60-70% with 250 concurrent sessions
+- **Actual capacity: ~34,560 sessions/day**
+- **Network is NOT a bottleneck** for audio-only sessions
 
 ---
 
@@ -373,12 +384,12 @@ For a **Hetzner CCX23** server (4 vCPU, 16GB RAM, €36.51/month):
 - Cost: 3 × €36.51 = €109.53/month
 
 **Advantages:**
-- 3× bandwidth capacity
+- 3× bandwidth capacity (though not needed for audio)
 - High availability (2+1 redundancy)
 - Better fault isolation
 - Can distribute geographically
 - Horizontal scaling path
-- Each server handles its own 1 Gbps
+- **Lower total cost than single large server**
 
 **Disadvantages:**
 - More complex management
@@ -386,142 +397,146 @@ For a **Hetzner CCX23** server (4 vCPU, 16GB RAM, €36.51/month):
 - Need Redis for session sharing
 - Higher operational overhead
 
-**Bandwidth Analysis:**
-- Peak concurrent: 15 sessions (5 per server)
-- Peak bandwidth: 15 × 100 Mbps = 1.5 Gbps (distributed)
-- **Network optimized: Each server uses ~500 Mbps**
-- Actual capacity: ~2,160 sessions/day
+**Capacity Analysis:**
+- Peak concurrent: ~180 sessions (60 per server)
+- Peak bandwidth: 180 × 4 Mbps = 720 Mbps (distributed)
+- Each server uses ~240 Mbps
+- **Actual capacity: ~25,920 sessions/day**
 
 ---
 
 ### Bandwidth Constraint Analysis
 
-#### Network Throughput Limits
+#### Network Throughput Limits (Audio-Only)
 
 **Hetzner Server Network:**
 - Shared 1 Gbps port per server
 - Actual usable: ~800-900 Mbps (accounting for overhead)
 - Recommended sustained: ~600-700 Mbps (70% of capacity)
 
-**Session Capacity by Network:**
-- At 100 Mbps per session: 6-7 sessions per server
-- At 150 Mbps per session (1080p): 4-5 sessions per server
-- At 50 Mbps per session (480p): 12-14 sessions per server
+**Session Capacity by Network (Audio-Only):**
+- At 4 Mbps per session: 150-175 sessions per server
+- At 6 Mbps per session (higher quality): 100-116 sessions per server
+- At 2 Mbps per session (lower quality): 300-350 sessions per server
 
-#### Bandwidth Bottleneck Comparison Table
+**Critical Difference:** Unlike video sessions, audio-only workloads are **CPU-limited**, not network-limited.
+
+#### Bottleneck Comparison Table (Audio-Only)
 
 | Configuration | Total vCPU | Total RAM | Network Capacity | CPU Limit* | Network Limit** | Bottleneck | Effective Capacity |
 |---------------|------------|-----------|------------------|------------|-----------------|------------|-------------------|
-| 1× CCX43 | 16 | 64GB | 1 Gbps | ~30 sessions | ~8 sessions | **Network** | 8 sessions |
-| 2× CCX23 | 8 | 32GB | 2 Gbps | ~16 sessions | ~16 sessions | Balanced | 16 sessions |
-| 3× CCX23 | 12 | 48GB | 3 Gbps | ~24 sessions | ~24 sessions | Balanced | 24 sessions |
-| 4× CX41 | 16 | 64GB | 4 Gbps | ~24 sessions | ~32 sessions | **CPU** | 24 sessions |
+| 1× CCX43 | 16 | 64GB | 1 Gbps | ~250 sessions | ~175 sessions | **CPU** | 175 sessions |
+| 2× CCX23 | 8 | 32GB | 2 Gbps | ~120 sessions | ~350 sessions | **CPU** | 120 sessions |
+| 3× CCX23 | 12 | 48GB | 3 Gbps | ~180 sessions | ~525 sessions | **CPU** | 180 sessions |
+| 4× CX41 | 16 | 64GB | 4 Gbps | ~240 sessions | ~700 sessions | **CPU** | 240 sessions |
 
-*Assuming 25% CPU per session with 30% headroom  
-**Assuming 100 Mbps per session at 70% network utilization
+*Assuming 3-5% CPU per session with 30% headroom (audio-only)
+**Assuming 4 Mbps per session at 70% network utilization
 
-### Key Finding: Network is the Primary Bottleneck
+### Key Finding: CPU is the Primary Bottleneck for Audio-Only
 
-**Critical Insight:** For video sessions with 8 participants, network bandwidth becomes the limiting factor before CPU or memory on larger servers.
+**Critical Insight:** For audio-only sessions with 8 participants, CPU becomes the limiting factor, not network bandwidth. This is the opposite of video sessions.
 
-**Recommendation:** 
-- **Multiple smaller servers provide better price/performance**
-- Better network utilization (3× 1Gbps > 1× 1Gbps)
-- Built-in redundancy
-- Horizontal scaling capability
-- More cost-effective at scale
+**Recommendation for Audio-Only:** 
+- **Single larger servers can be cost-effective** since network is not a constraint
+- CPU cores are the primary resource to optimize
+- Consider CCX series (dedicated CPU) over CX series for better performance
+- Multiple smaller servers still provide redundancy benefits but less critical for bandwidth
 
 ---
 
 ## Recommendations
 
-### Small Scale (< 500 sessions/day)
+### Small Scale (< 5,000 sessions/day)
 
 **Recommended Setup:**
 - **Server:** Hetzner CX41 (4 vCPU, 16GB RAM)
 - **Deployment:** Docker Compose (from guide 06)
 - **Monitoring:** Basic (logs + Caddy)
 - **Monthly Cost:** €25-30
-- **Cost per session:** €0.06-0.08
+- **Cost per session:** €0.003-0.004
 
 **Rationale:**
 - Single server simplicity
 - Adequate capacity with headroom
 - Easy to manage
-- Cost-effective
+- Cost-effective for audio-only workloads
 
-### Medium Scale (500-2,000 sessions/day)
+### Medium Scale (5,000-20,000 sessions/day)
 
 **Recommended Setup:**
-- **Servers:** 2× Hetzner CCX23
-- **Load Balancer:** HAProxy on CX11
-- **State:** Redis (self-hosted on one server)
-- **Deployment:** Docker Compose + HAProxy
-- **Monitoring:** Prometheus + Grafana
-- **Monthly Cost:** €80-100
-- **Cost per session:** €0.05-0.06
+- **Servers:** 1× Hetzner CCX23 or CCX33
+- **Deployment:** Docker Compose
+- **Monitoring:** Prometheus + Grafana (optional for single server)
+- **Monthly Cost:** €40-75
+- **Cost per session:** €0.002-0.004
 
 **Rationale:**
-- Addresses network bottleneck
-- High availability
-- Room for growth
-- Better than single large server
+- Single server can handle this load for audio-only
+- No need for load balancing yet
+- Simple management
+- Excellent cost efficiency
 
-### Large Scale (2,000+ sessions/day)
+### Large Scale (20,000+ sessions/day)
 
 **Recommended Setup:**
-- **Servers:** 3-5× Hetzner CCX23 or 2-3× CCX33
-- **Load Balancer:** Dedicated HAProxy/NGINX
-- **State:** Managed Redis or dedicated instance
-- **Deployment:** Kubernetes or advanced Docker setup
+- **Servers:** 2-4× Hetzner CCX33 or 1-2× CCX43
+- **Load Balancer:** HAProxy/NGINX on small instance or integrated
+- **State:** Redis for session sharing (if multi-server)
+- **Deployment:** Docker Compose or Kubernetes for very large scale
 - **Monitoring:** Full Prometheus + Grafana + alerting
-- **Monthly Cost:** €150-300+
-- **Cost per session:** €0.04-0.05
+- **Monthly Cost:** €150-350+
+- **Cost per session:** €0.002-0.005
 
 **Rationale:**
-- Kubernetes for orchestration
-- Multi-region option
-- Auto-scaling capability
+- High availability through redundancy
+- Geographic distribution option
+- CPU capacity for high concurrency
 - Professional monitoring
-- Optimal network utilization
+- Room for growth
 
 ### Cost Efficiency Recommendations
 
-1. **Start Small, Scale Horizontally:**
+1. **Start Small, Scale Vertically First:**
    - Begin with CX41 or CCX23
-   - Add servers as needed
-   - Avoid over-provisioning
+   - Upgrade to larger CPU instances as needed
+   - Audio-only allows vertical scaling to be effective
+   - Add multiple servers only for redundancy/geography
 
-2. **Network Optimization:**
-   - Use multiple smaller servers vs one large
-   - Distribute load for better bandwidth utilization
-   - Monitor network saturation
+2. **CPU Optimization (Primary Concern for Audio):**
+   - Choose dedicated CPU instances (CCX series) for predictable performance
+   - Monitor CPU usage as primary capacity metric
+   - Network bandwidth is rarely a concern for audio-only
 
 3. **Session Optimization:**
-   - Default to 720p video (can handle 1080p for smaller groups)
-   - Enable simulcast for larger rooms
-   - Use adaptive bitrate
+   - Use Opus codec (64 kbps default is excellent)
+   - Consider adaptive bitrate for varying network conditions
+   - Audio quality settings have minimal impact on server resources
 
 4. **Monitoring is Essential:**
    - Track concurrent sessions
-   - Monitor network utilization
-   - Set up alerts for capacity thresholds
+   - Monitor CPU utilization per core
+   - Set up alerts for 70% CPU capacity thresholds
+   - Network monitoring is less critical than for video
 
 5. **Reserved Capacity:**
    - Hetzner doesn't offer reserved pricing
-   - Use auto-scaling for cost control
+   - Use auto-scaling for cost control (if using Kubernetes)
    - Consider time-based scaling for predictable loads
+   - Single server can handle surprisingly high loads for audio
 
-### Video Quality Trade-offs
+### Audio Quality Trade-offs
 
-| Quality | Resolution | Bitrate | Bandwidth/Session (8p) | Sessions/Server* |
-|---------|-----------|---------|------------------------|------------------|
-| Low (Mobile) | 480p @ 15fps | 0.5 Mbps | ~40 Mbps | 15-18 |
-| Standard | 720p @ 30fps | 1.5 Mbps | ~100 Mbps | 6-8 |
-| High | 1080p @ 30fps | 3 Mbps | ~200 Mbps | 3-4 |
-| Ultra | 1080p @ 60fps | 6 Mbps | ~400 Mbps | 1-2 |
+| Quality | Codec Settings | Bitrate | Bandwidth/Session (8p) | Sessions/Server* | Use Case |
+|---------|---------------|---------|------------------------|------------------|----------|
+| Low (Voice) | Opus @ 32 kbps | 32 kbps | ~2 Mbps | 300-350 | Basic voice calls |
+| Standard | Opus @ 64 kbps | 64 kbps | ~4 Mbps | 150-175 | Default conferencing |
+| High | Opus @ 96 kbps | 96 kbps | ~6 Mbps | 100-116 | High-quality audio |
+| Premium | Opus @ 128 kbps | 128 kbps | ~8 Mbps | 75-87 | Music/professional |
 
-*Based on CCX23 with network bottleneck consideration
+*Based on CCX23 with CPU as primary constraint
+
+**Note:** Audio quality has minimal impact on server resources. The differences are primarily in network bandwidth, which is rarely a bottleneck. Even premium quality audio uses far less bandwidth than video.
 
 ### Deployment Environment Options
 
@@ -604,35 +619,49 @@ For a **Hetzner CCX23** server (4 vCPU, 16GB RAM, €36.51/month):
 
 ### Key Findings
 
-1. **Single Session Cost:** ~€0.008 (less than 1 cent) for raw compute
-2. **Bandwidth is Free:** Hetzner's generous policy eliminates bandwidth costs
-3. **Network is the Bottleneck:** Not CPU or RAM for video sessions
-4. **Multiple Small Servers > One Large:** Better bandwidth utilization
-5. **Cost per Session at Scale:** €0.04-0.06 at 70% utilization
+1. **Single Session Cost:** ~€0.008 (less than 1 cent) for raw compute, but amortized cost at scale is ~€0.00014
+2. **Bandwidth is Essentially Free:** Hetzner's generous policy + audio-only's low bandwidth means no bandwidth concerns
+3. **CPU is the Bottleneck:** Not network bandwidth (unlike video sessions)
+4. **Single Larger Servers are Viable:** Network bottleneck eliminated for audio-only
+5. **Cost per Session at Scale:** €0.00014-€0.00017 at 70% utilization
+6. **Audio-Only Advantage:** 6-10× higher concurrency per server compared to video sessions
 
-### Capacity Summary
+### Capacity Summary (Audio-Only)
 
 | Configuration | Monthly Cost | Sessions/Day | Cost/Session | Best For |
 |---------------|--------------|--------------|--------------|----------|
-| 1× CX41 | €25-30 | 500-800 | €0.06-0.08 | Startup/Testing |
-| 1× CCX23 | €40-50 | 800-1,200 | €0.05-0.06 | Small Business |
-| 2× CCX23 | €80-100 | 1,500-2,000 | €0.05-0.06 | Growing Business |
-| 3× CCX23 | €120-140 | 2,000-3,000 | €0.04-0.05 | Medium Scale |
-| Kubernetes | €200-400 | 5,000+ | €0.04-0.05 | Enterprise |
+| 1× CX21 | €6-10 | 2,000-3,000 | €0.002-0.003 | Startup/Testing |
+| 1× CX41 | €25-30 | 7,000-10,000 | €0.0025-0.003 | Small Business |
+| 1× CCX23 | €40-50 | 8,000-11,000 | €0.0036-0.005 | Growing Business |
+| 1× CCX33 | €75-85 | 17,000-23,000 | €0.0033-0.0044 | Medium Scale |
+| 2× CCX33 | €150-165 | 34,000-46,000 | €0.0033-0.0044 | Large Scale |
+| Kubernetes | €250-500 | 80,000+ | €0.003-0.005 | Enterprise |
 
 ### Final Recommendations
 
-1. **Start with:** Hetzner CCX23 + Docker Compose + Caddy (Guide 06)
-2. **Scale to:** Multiple CCX23 servers with load balancing
-3. **Monitor:** Network bandwidth as primary constraint
-4. **Optimize:** Use 720p default, enable simulcast, adaptive bitrate
-5. **Plan:** Add server capacity when >70% network utilization
+1. **Start with:** Hetzner CX41 or CCX23 + Docker Compose + Caddy (Guide 06)
+2. **Scale to:** Single larger server first (CCX33/CCX43), then multiple servers for redundancy
+3. **Monitor:** CPU utilization as primary constraint (not network)
+4. **Optimize:** Use standard Opus codec (64 kbps), enable adaptive bitrate if needed
+5. **Plan:** Upgrade server when >70% CPU utilization consistently
 
 ### Cost Advantages vs Cloud Providers
 
-Compared to AWS/GCP for the same workload:
-- **Hetzner:** €100/month (2,000 sessions/day)
-- **AWS:** ~€1,500-2,000/month (bandwidth costs)
-- **GCP:** ~€1,200-1,800/month (bandwidth costs)
+Compared to AWS/GCP for the same audio-only workload (20,000 sessions/day):
+- **Hetzner:** €75-100/month
+- **AWS:** ~€400-600/month (bandwidth + compute costs)
+- **GCP:** ~€350-550/month (bandwidth + compute costs)
 
-**Hetzner provides 15-20× cost savings primarily due to free bandwidth.**
+**Hetzner provides 5-7× cost savings for audio-only, with bandwidth being free and compute being significantly cheaper.**
+
+### Audio-Only vs Video Comparison
+
+**Key Differences:**
+- **Bandwidth:** 25× less (4 Mbps vs 100 Mbps per session)
+- **CPU Usage:** 5-10× less per session
+- **Concurrency:** 6-10× more sessions per server
+- **Cost per Session:** 10-15× lower at scale
+- **Bottleneck:** CPU-limited instead of network-limited
+- **Scaling Strategy:** Vertical scaling viable; horizontal for redundancy
+
+**Recommendation:** Audio-only conferencing is dramatically more cost-effective and can handle significantly higher scale on modest hardware.
