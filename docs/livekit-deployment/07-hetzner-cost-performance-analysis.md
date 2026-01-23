@@ -48,8 +48,8 @@ This document provides a comprehensive cost and performance breakdown for deploy
 
 In LiveKit's SFU (Selective Forwarding Unit) architecture:
 
-- **Ingress (receiving from participants):** 8 × 1.564 Mbps = 12.512 Mbps
-- **Egress (sending to participants):** 8 × 10.948 Mbps = 87.584 Mbps
+- **Ingress (receiving from participants):** 8 × (1.5 Mbps video + 0.064 Mbps audio) = 8 × 1.564 Mbps = 12.512 Mbps
+- **Egress (sending to participants):** 8 × (7 × 1.5 Mbps video + 7 × 0.064 Mbps audio) = 8 × 10.948 Mbps = 87.584 Mbps
 - **Total Session Bandwidth:** ~100 Mbps
 
 #### Data Transfer per Session
