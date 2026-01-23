@@ -177,6 +177,33 @@ Step-by-step LiveKit deployment on Hetzner, optimized for the fastest path to a 
 **Cons**: Slight container overhead, still manual scaling
 
 ---
+### [💰 Hetzner Cost & Performance Analysis](07-hetzner-cost-performance-analysis.md)
+
+Comprehensive cost and performance breakdown for LiveKit on Hetzner infrastructure with detailed capacity planning.
+
+**Contents**:
+
+- Single session cost analysis (8 participants, 10 minutes)
+- Bandwidth requirements and costs
+- Server capacity planning with headroom for spikes
+- Multi-host scaling requirements and costs
+- Server sizing matrix with Hetzner options
+- Large server vs multiple small servers comparison
+- Network bandwidth constraint analysis
+- Detailed recommendations by scale
+
+**Best for**:
+
+- Financial planning and budgeting
+- Capacity planning decisions
+- Server sizing selection
+- Cost optimization strategies
+- Understanding bandwidth constraints
+
+**Key Insights**: Network bandwidth is the primary bottleneck, multiple smaller servers provide better value than one large server, Hetzner's free bandwidth offers 15-20× cost savings vs AWS/GCP
+
+---
+
 
 ## Quick Start Guide
 
