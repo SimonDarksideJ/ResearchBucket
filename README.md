@@ -2,6 +2,25 @@
 
 A repository for comprehensive research and analysis on hosting infrastructure and deployment solutions.
 
+## 🚀 Quick Start
+
+**[📋 Quick Reference Guide](QUICK-REFERENCE.md)** - Costs, external services, and DNS setup cheat sheet
+
+### For Mac Development (FREE)
+```bash
+git clone https://github.com/SimonDarksideJ/ResearchBucket.git
+cd ResearchBucket/deployment-tools
+./scripts/install-mac.sh --storage /Volumes/YourDrive/livekit
+```
+
+### For Hetzner Production (~$13/month)
+```bash
+# After creating server and configuring DNS
+./scripts/deploy.sh --platform linux --env production
+```
+
+---
+
 ## 📚 Research Documents
 
 ### Linux Hosting Research for LiveKit Media Server
