@@ -2,6 +2,21 @@
 
 Comprehensive guides for deploying LiveKit Server across various platforms and architectures.
 
+## 🚀 Quick Start
+
+**New to LiveKit deployment? Start here:**
+
+### [⚡ Quick Reference Guide](10-quick-reference.md) **START HERE!**
+
+Your personalized deployment guide based on your requirements:
+- **Mac Development**: Tailscale setup (100% free, 5 minutes)
+- **Hetzner Production**: Quick-start for existing domains (15 minutes)
+- Cost summaries, common commands, troubleshooting tips
+
+**Perfect for**: Getting started quickly with recommended setup
+
+---
+
 ## Overview
 
 LiveKit is an open-source platform for building real-time video, audio, and data applications. This documentation provides detailed deployment guides for multiple deployment strategies, from simple single-server setups to complex multi-cloud architectures.
@@ -24,7 +39,7 @@ LiveKit is an open-source platform for building real-time video, audio, and data
 
 ---
 
-### [💰 Cost & Configuration Guide](09-cost-and-configuration-guide.md) **NEW!**
+### [💰 Cost & Configuration Guide](09-cost-and-configuration-guide.md)
 
 **Essential reading!** Complete cost breakdown and external configuration requirements.
 
