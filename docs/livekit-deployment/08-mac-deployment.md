@@ -512,183 +512,645 @@ curl 'http://localhost:9090/api/v1/query?query=livekit_room_total'
 
 ## Reverse Proxy Setup
 
-The setup script offers multiple reverse proxy options. Here's detailed information for each:
+The setup script offers multiple reverse proxy options. Here's detailed information for each, including costs and setup instructions.
+
+### Cost Overview
+
+| Service | Free Tier | Paid Plans | Best For |
+|---------|-----------|------------|----------|
+| **ngrok** | ✅ Yes (limited) | From $8/month | Quick setup, testing |
+| **Cloudflare Tunnel** | ✅ Yes (unlimited) | N/A (free forever) | Production, custom domains |
+| **Tailscale** | ✅ Yes (up to 100 devices) | From $6/user/month | Private access, development |
+| **LocalTunnel** | ✅ Yes (completely free) | N/A | Quick testing only |
+
+💰 **Cost-Saving Recommendation**: Use **Cloudflare Tunnel** (100% free) for production or **Tailscale** (free for personal use) for development.
+
+---
 
 ### Option 1: ngrok (Recommended for Quick Setup)
 
+**🔗 Links:**
+- Sign up: [ngrok.com/signup](https://ngrok.com/signup)
+- Dashboard: [dashboard.ngrok.com](https://dashboard.ngrok.com)
+- Pricing: [ngrok.com/pricing](https://ngrok.com/pricing)
+- Documentation: [ngrok.com/docs](https://ngrok.com/docs)
+
+**💰 Cost:**
+- **Free Tier**: 
+  - ✅ 1 online endpoint
+  - ✅ Random URLs (changes on restart)
+  - ✅ 40 connections/minute
+  - ✅ HTTPS included
+  - ❌ No custom domains
+  - ❌ No reserved URLs
+  
+- **Personal Plan ($8/month)**:
+  - ✅ 3 endpoints
+  - ✅ Custom/reserved domains
+  - ✅ 120 connections/minute
+  - ✅ TLS certificates
+  
+- **Pro Plan ($20/month)**:
+  - ✅ 10 endpoints
+  - ✅ IP restrictions
+  - ✅ 600 connections/minute
+
 **Pros:**
-- ✅ Easiest to set up
+- ✅ Easiest to set up (2 minutes)
 - ✅ Works instantly
 - ✅ HTTPS included
 - ✅ Free tier available
+- ✅ No domain required
 
 **Cons:**
 - ❌ URLs change on restart (free tier)
 - ❌ Requires account
 - ❌ Rate limits on free tier
+- ❌ Costs money for custom domains
 
 #### Setup Steps:
 
-1. **Create ngrok account**: [ngrok.com/signup](https://ngrok.com/signup)
+**Step 1: Create Account**
+1. Go to [ngrok.com/signup](https://ngrok.com/signup)
+2. Sign up with email, Google, or GitHub
+3. Verify your email
 
-2. **Get auth token** from dashboard
+**Step 2: Get Auth Token**
+1. Log in to [dashboard.ngrok.com](https://dashboard.ngrok.com)
+2. Click "Your Authtoken" in the left sidebar
+3. Copy your authtoken
 
-3. **Configure ngrok:**
+**Step 3: Install and Configure**
 ```bash
-# Install ngrok
-brew install ngrok
+# Install ngrok via Homebrew
+brew install ngrok/ngrok/ngrok
 
-# Add auth token
-ngrok config add-authtoken YOUR_AUTH_TOKEN
+# Add your auth token (replace with your actual token)
+ngrok config add-authtoken YOUR_AUTH_TOKEN_HERE
 
-# Start tunnel (automated by scripts)
-ngrok http 7880 --subdomain=mylivekit  # paid plan
-# or
-ngrok http 7880  # free (random URL)
+# Verify installation
+ngrok --version
 ```
 
-4. **Access via URL** shown in ngrok dashboard
+**Step 4: Start Tunnel**
 
-#### Persistent URLs (Paid Feature):
-
+For **free tier** (random URL):
 ```bash
-# With paid plan, get permanent subdomain
-ngrok http 7880 --subdomain=mylivekit
+# Start tunnel to LiveKit
+ngrok http 7880
 
-# Your URL: https://mylivekit.ngrok-free.app
+# You'll see output like:
+# Forwarding: https://abc123-random.ngrok-free.app -> http://localhost:7880
 ```
 
-### Option 2: Cloudflare Tunnel
+For **paid plan** (custom subdomain):
+```bash
+# Use a custom subdomain
+ngrok http 7880 --domain=mylivekit.ngrok-free.app
+
+# Or with custom domain (Pro plan)
+ngrok http 7880 --domain=livekit.yourdomain.com
+```
+
+**Step 5: Use the URL**
+- Copy the HTTPS URL from ngrok output
+- Use it in your LiveKit client configuration
+- Example: `wss://abc123-random.ngrok-free.app`
+
+**💡 Tip for Mac Deployment:**
+The setup script will automate this process. When you run `./tools/mac-livekit/scripts/setup.sh`, it will:
+1. Prompt for your ngrok authtoken
+2. Configure ngrok automatically
+3. Start the tunnel as a background service
+4. Display your public URL
+
+**Keep Costs Down:**
+- ✅ Free tier works fine for testing (up to 40 conn/min)
+- ✅ Only upgrade if you need custom domains
+- ✅ Consider Cloudflare Tunnel (free) as alternative
+
+### Option 2: Cloudflare Tunnel (🏆 Best Free Option)
+
+**🔗 Links:**
+- Sign up: [dash.cloudflare.com/sign-up](https://dash.cloudflare.com/sign-up)
+- Tunnel Dashboard: [one.dash.cloudflare.com](https://one.dash.cloudflare.com)
+- Documentation: [developers.cloudflare.com/cloudflare-one/connections/connect-apps](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps)
+- Get a domain: [Namecheap](https://namecheap.com) ($8-15/year), [Google Domains](https://domains.google), [Cloudflare Registrar](https://www.cloudflare.com/products/registrar/)
+
+**💰 Cost:**
+- **Cloudflare Tunnel**: ✅ **100% FREE** (no limits, no paid plans)
+- **Domain Name**: ~$10-15/year (one-time annual cost)
+  - .com domains: $10-15/year
+  - .net domains: $12-18/year
+  - .io domains: $30-40/year
+  - Can use existing domain if you have one
+
+**Total Annual Cost**: $10-15/year for domain only (if you don't have one)
 
 **Pros:**
-- ✅ Free
+- ✅ **Completely free** (tunnel service)
 - ✅ Custom domain support
-- ✅ DDoS protection
+- ✅ DDoS protection included
 - ✅ Persistent URLs
+- ✅ No rate limits
+- ✅ Enterprise-grade infrastructure
+- ✅ Can tunnel multiple services
 
 **Cons:**
 - ❌ Requires Cloudflare account
-- ❌ Need to own a domain
-- ❌ More setup steps
+- ❌ Need to own a domain (~$10-15/year)
+- ❌ More setup steps than ngrok
+- ❌ Domain must use Cloudflare nameservers
+
+#### Prerequisites:
+
+1. **Cloudflare Account** (free)
+2. **A domain name** you own (or buy one for ~$10-15/year)
+3. **Domain configured to use Cloudflare nameservers**
 
 #### Setup Steps:
 
-1. **Install cloudflared:**
+**Step 1: Get a Domain (if you don't have one)**
+
+If you don't own a domain, buy one from:
+- [Namecheap](https://namecheap.com): Popular, affordable ($9-12/year)
+- [Google Domains](https://domains.google): Simple interface ($12/year)
+- [Cloudflare Registrar](https://www.cloudflare.com/products/registrar/): At-cost pricing ($8-9/year)
+- [Porkbun](https://porkbun.com): Budget-friendly ($8-10/year)
+
+💡 Tip: Choose a `.com` or `.net` domain for best compatibility. Avoid exotic TLDs for production.
+
+**Step 2: Add Domain to Cloudflare**
+
+1. Go to [dash.cloudflare.com](https://dash.cloudflare.com)
+2. Sign up for free account
+3. Click "Add a Site"
+4. Enter your domain name
+5. Choose **Free plan** (it's all you need)
+6. Cloudflare will scan your DNS records
+7. Click "Continue"
+
+**Step 3: Update Nameservers**
+
+1. Cloudflare will show you two nameservers like:
+   - `ns1.cloudflare.com`
+   - `ns2.cloudflare.com`
+2. Go to your domain registrar (where you bought the domain)
+3. Find "Nameservers" or "DNS Settings"
+4. Replace existing nameservers with Cloudflare's
+5. Save changes (can take 5 minutes to 24 hours to propagate)
+6. Return to Cloudflare and click "Done, check nameservers"
+
+**Step 4: Install cloudflared**
+
 ```bash
+# Install via Homebrew (Mac)
 brew install cloudflare/cloudflare/cloudflared
+
+# Verify installation
+cloudflared --version
 ```
 
-2. **Authenticate:**
+**Step 5: Authenticate**
+
 ```bash
+# Log in to Cloudflare
 cloudflared tunnel login
+
+# This will:
+# 1. Open your browser
+# 2. Ask you to select which domain to use
+# 3. Save credentials to ~/.cloudflared/
 ```
 
-3. **Create tunnel:**
+**Step 6: Create Tunnel**
+
 ```bash
+# Create a new tunnel (choose any name)
 cloudflared tunnel create livekit
+
+# This will output:
+# Created tunnel livekit with id <TUNNEL_ID>
+# Credentials written to: /Users/you/.cloudflared/<TUNNEL_ID>.json
 ```
 
-4. **Configure tunnel:**
+**Step 7: Configure Tunnel**
+
 ```bash
-cat > ~/.cloudflared/config.yml << 'EOF'
+# Create config file
+mkdir -p ~/.cloudflared
+nano ~/.cloudflared/config.yml
+```
+
+Add this configuration (replace `<TUNNEL_ID>` and adjust paths):
+
+```yaml
 tunnel: <TUNNEL_ID>
 credentials-file: /Users/you/.cloudflared/<TUNNEL_ID>.json
 
+ingress:
+  # LiveKit on your custom subdomain
+  - hostname: livekit.yourdomain.com
+    service: http://localhost:7880
+  
+  # Optional: Also tunnel monitoring dashboard
+  - hostname: monitoring.yourdomain.com
+    service: http://localhost:3000
+  
+  # Catch-all rule (required)
+  - service: http_status:404
+```
+
+**Step 8: Create DNS Records**
+
+```bash
+# Route DNS to tunnel (replace livekit with your tunnel name)
+cloudflared tunnel route dns livekit livekit.yourdomain.com
+
+# For monitoring (optional)
+cloudflared tunnel route dns livekit monitoring.yourdomain.com
+```
+
+This creates CNAME records automatically pointing to your tunnel.
+
+**Step 9: Start Tunnel**
+
+```bash
+# Run tunnel (keeps running in terminal)
+cloudflared tunnel run livekit
+
+# Or run as background service
+cloudflared service install
+```
+
+**Step 10: Verify**
+
+```bash
+# Test your LiveKit endpoint
+curl https://livekit.yourdomain.com/health
+
+# Test monitoring (if configured)
+open https://monitoring.yourdomain.com
+```
+
+**💡 Tip for Mac Deployment:**
+The setup script can help configure Cloudflare Tunnel:
+1. Run `./tools/mac-livekit/scripts/setup.sh --proxy cloudflare`
+2. Follow prompts to enter tunnel ID and domain
+3. Script will create config and start tunnel
+
+**Keep Costs Down:**
+- ✅ Cloudflare Tunnel is 100% free forever
+- ✅ Only cost is domain (~$10/year)
+- ✅ Can tunnel multiple services (LiveKit + monitoring + more)
+- ✅ No bandwidth charges
+- ✅ No connection limits
+
+**Advanced: Multiple Services**
+
+You can tunnel multiple ports through one Cloudflare Tunnel:
+
+```yaml
 ingress:
   - hostname: livekit.yourdomain.com
     service: http://localhost:7880
   - hostname: monitoring.yourdomain.com
     service: http://localhost:3000
+  - hostname: app.yourdomain.com
+    service: http://localhost:8080
   - service: http_status:404
-EOF
 ```
 
-5. **Create DNS record:**
-```bash
-cloudflared tunnel route dns livekit livekit.yourdomain.com
-```
+Each subdomain is free - no extra cost!
 
-6. **Start tunnel:**
-```bash
-cloudflared tunnel run livekit
-```
+### Option 3: Tailscale (🏆 Best for Private/Development Use)
 
-The setup script can run this as a background service.
+**🔗 Links:**
+- Sign up: [tailscale.com/start](https://tailscale.com/start)
+- Dashboard: [login.tailscale.com/admin](https://login.tailscale.com/admin)
+- Download: [tailscale.com/download](https://tailscale.com/download)
+- Pricing: [tailscale.com/pricing](https://tailscale.com/pricing)
+- Documentation: [tailscale.com/kb](https://tailscale.com/kb)
 
-### Option 3: Tailscale (Private Network)
+**💰 Cost:**
+- **Personal Plan**: ✅ **100% FREE**
+  - Up to 100 devices
+  - 3 users
+  - 1 subnet router
+  - Perfect for personal/dev use
+  
+- **Premium Plan** ($6/user/month):
+  - Unlimited devices
+  - Advanced features (access controls, SSO)
+  - Only needed for teams/enterprise
+
+**Total Cost**: $0/month for personal use
 
 **Pros:**
-- ✅ Most secure (private network)
-- ✅ Free for personal use
-- ✅ No public exposure
+- ✅ **Completely free** for personal use (up to 100 devices)
+- ✅ Most secure option (private mesh network)
+- ✅ No public exposure (not visible on internet)
+- ✅ Works behind firewalls/NAT
 - ✅ Excellent for development
+- ✅ Easy to add team members
+- ✅ Mobile apps available
 
 **Cons:**
 - ❌ Only accessible to Tailscale network members
 - ❌ Not suitable for public services
+- ❌ Clients must install Tailscale
 
 #### Setup Steps:
 
-1. **Install Tailscale:**
+**Step 1: Create Account**
+
+1. Go to [tailscale.com/start](https://tailscale.com/start)
+2. Click "Get Started"
+3. Sign in with Google, GitHub, or Microsoft
+4. Choose **Personal** plan (free)
+
+**Step 2: Install Tailscale on Mac**
+
 ```bash
+# Install via Homebrew
 brew install tailscale
+
+# Or download from website
+# https://tailscale.com/download/mac
 ```
 
-2. **Start Tailscale:**
+**Step 3: Start Tailscale**
+
 ```bash
+# Start Tailscale and authenticate
 sudo tailscale up
+
+# This will:
+# 1. Open browser for authentication
+# 2. Connect your Mac to your Tailscale network
+# 3. Assign a stable IP address
 ```
 
-3. **Access via Tailscale IP:**
+**Step 4: Get Your Tailscale IP**
+
 ```bash
-# Get your Mac's Tailscale IP
+# Get your Mac's Tailscale IP address
 tailscale ip -4
 
-# Access LiveKit from any device on your Tailscale network
-# http://100.x.x.x:7880
+# Example output: 100.101.102.103
 ```
+
+**Step 5: Access LiveKit**
+
+From any device on your Tailscale network:
+
+```bash
+# Use the Tailscale IP
+http://100.101.102.103:7880
+
+# Or if you enabled MagicDNS
+http://your-mac-name.tailnet-name.ts.net:7880
+```
+
+**Step 6: Add Other Devices**
+
+Install Tailscale on any device you want to access LiveKit from:
+- **Mac/Windows/Linux**: [tailscale.com/download](https://tailscale.com/download)
+- **iOS**: [App Store](https://apps.apple.com/app/tailscale/id1470499037)
+- **Android**: [Play Store](https://play.google.com/store/apps/details?id=com.tailscale.ipn)
+
+After installing, sign in with the same account and you're connected!
+
+**Enable MagicDNS (Optional but Recommended)**
+
+1. Go to [login.tailscale.com/admin/dns](https://login.tailscale.com/admin/dns)
+2. Enable "MagicDNS"
+3. Now you can use hostnames instead of IPs:
+   ```bash
+   http://your-mac.tailnet.ts.net:7880
+   ```
+
+**💡 Tip for Mac Deployment:**
+The setup script supports Tailscale:
+1. Run `./tools/mac-livekit/scripts/setup.sh --proxy tailscale`
+2. Script will check if Tailscale is running
+3. Display your Tailscale IP for access
+
+**Use Cases:**
+- ✅ Development and testing
+- ✅ Private demos to clients/team
+- ✅ Access from mobile devices
+- ✅ Remote work (access home Mac from anywhere)
+- ❌ Public website/app (use Cloudflare or ngrok instead)
+
+**Keep Costs Down:**
+- ✅ 100% free for personal use
+- ✅ No bandwidth charges
+- ✅ Up to 100 devices
+- ✅ Never expires
+
+---
 
 ### Option 4: LocalTunnel (Free, No Account)
 
+**🔗 Links:**
+- Website: [localtunnel.me](https://localtunnel.me)
+- GitHub: [github.com/localtunnel/localtunnel](https://github.com/localtunnel/localtunnel)
+- Documentation: [theboroer.github.io/localtunnel-www](https://theboroer.github.io/localtunnel-www/)
+
+**💰 Cost:**
+- ✅ **100% FREE** (forever, no accounts, no limits)
+- ✅ No sign-up required
+- ✅ No auth tokens needed
+
+**Total Cost**: $0/month
+
 **Pros:**
-- ✅ No account needed
-- ✅ Quick testing
-- ✅ Free
+- ✅ **No account needed** (quickest setup)
+- ✅ Quick testing (30 seconds to start)
+- ✅ 100% free
+- ✅ No rate limits
+- ✅ HTTPS included
 
 **Cons:**
-- ❌ Less reliable
-- ❌ Random URLs
-- ❌ Basic features
+- ❌ Less reliable than other options
+- ❌ Random URLs every time
+- ❌ No custom domains
+- ❌ Can be slow
+- ❌ Not suitable for production
+- ❌ URLs expire when tunnel stops
 
-#### Setup:
+#### Setup Steps:
+
+**Step 1: Install LocalTunnel**
+
+Requires Node.js (install via `brew install node` if needed)
 
 ```bash
-# Install
+# Install via npm
 npm install -g localtunnel
 
-# Start tunnel
-lt --port 7880 --subdomain mylivekit
+# Verify installation
+lt --version
 ```
+
+**Step 2: Start Tunnel**
+
+```bash
+# Start tunnel to LiveKit
+lt --port 7880
+
+# Output will show:
+# your url is: https://random-name-123.loca.lt
+```
+
+**Optional: Request Specific Subdomain**
+
+```bash
+# Try to get a specific subdomain (not guaranteed)
+lt --port 7880 --subdomain mylivekit
+
+# If available: https://mylivekit.loca.lt
+# If taken: Falls back to random URL
+```
+
+**Step 3: Use the URL**
+
+- Copy the URL from output
+- Use it immediately (it expires when you stop the tunnel)
+- Example: `wss://random-name-123.loca.lt`
+
+**Important Notes:**
+- ⚠️ First visit may show password page (just click through)
+- ⚠️ URL changes every time you restart
+- ⚠️ Connection can be unreliable
+- ⚠️ Not recommended for demos or production
+
+**💡 Tip for Mac Deployment:**
+LocalTunnel is best for quick testing only:
+```bash
+# Quick test without setup script
+lt --port 7880
+
+# Use the URL for quick validation
+curl https://your-url.loca.lt/health
+```
+
+**Use Cases:**
+- ✅ Quick 5-minute test
+- ✅ Showing something to a colleague right now
+- ✅ Emergency demo (when nothing else works)
+- ❌ Anything longer than 30 minutes
+- ❌ Production or staging environments
+- ❌ Client demos
+
+**Keep Costs Down:**
+- ✅ 100% free forever
+- ✅ No account or credit card
+- ✅ Perfect for quick tests
 
 ### Comparison Matrix
 
 | Feature | ngrok | Cloudflare | Tailscale | LocalTunnel |
 |---------|-------|------------|-----------|-------------|
-| **Free Tier** | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes |
-| **Custom Domain** | 💰 Paid | ✅ Yes | ❌ No | ❌ No |
-| **Persistent URL** | 💰 Paid | ✅ Yes | ✅ Yes | ❌ No |
+| **Free Tier** | ✅ Yes (limited) | ✅ Yes (unlimited) | ✅ Yes (100 devices) | ✅ Yes (unlimited) |
+| **Cost (Free)** | $0/month | $0/month* | $0/month | $0/month |
+| **Cost (Paid)** | $8-20/month | N/A (free only) | $6/user/month | N/A (free only) |
+| **Domain Cost** | Included (paid) | ~$10/year** | N/A | N/A |
+| **Custom Domain** | 💰 Paid only | ✅ Free | ❌ No | ❌ No |
+| **Persistent URL** | 💰 Paid only | ✅ Free | ✅ Free | ❌ No |
 | **HTTPS** | ✅ Yes | ✅ Yes | ⚠️ Optional | ✅ Yes |
+| **Setup Time** | ⭐ 2 min | ⭐⭐ 10 min | ⭐ 2 min | ⭐ 30 sec |
 | **Setup Difficulty** | ⭐ Easy | ⭐⭐ Medium | ⭐ Easy | ⭐ Easy |
-| **Public Access** | ✅ Yes | ✅ Yes | ❌ No | ✅ Yes |
+| **Public Access** | ✅ Yes | ✅ Yes | ❌ No (private) | ✅ Yes |
 | **Account Required** | ✅ Yes | ✅ Yes | ✅ Yes | ❌ No |
-| **Rate Limits** | ⚠️ Yes | ✅ No | ✅ No | ⚠️ Yes |
+| **Rate Limits** | ⚠️ 40 conn/min | ✅ None | ✅ None | ⚠️ Variable |
+| **Reliability** | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐ |
+| **Best For** | Quick setup | Production | Development | Quick tests |
 
-### Recommendation
+\* Cloudflare Tunnel is free, but requires a domain name (~$10/year if you don't have one)  
+\*\* One-time annual cost for domain registration
 
-- **Development/Testing**: Tailscale or ngrok
-- **Production (free)**: Cloudflare Tunnel
-- **Production (paid)**: ngrok with custom domain
-- **Quick testing**: LocalTunnel
+### Total Cost Comparison (Annual)
+
+| Use Case | ngrok | Cloudflare | Tailscale | LocalTunnel |
+|----------|-------|------------|-----------|-------------|
+| **Testing (1 week)** | $0 (free) | $0 | $0 | $0 |
+| **Development (ongoing)** | $0-$96/year | $10/year | $0 | $0 |
+| **Small Production** | $96-$240/year | $10/year | $0* | Not recommended |
+| **Production + Custom Domain** | $96-$240/year | $10/year | Not suitable | Not suitable |
+
+\* Tailscale free tier fine for private access; not suitable for public production
+
+### Recommendation by Use Case
+
+#### 🏆 **Lowest Cost Production**: Cloudflare Tunnel
+- **Cost**: ~$10/year (domain only)
+- **Benefits**: Custom domain, unlimited bandwidth, enterprise DDoS protection
+- **Best when**: You want a professional setup on a budget
+
+#### 🏆 **Zero Cost Development**: Tailscale
+- **Cost**: $0/month
+- **Benefits**: Secure private network, works everywhere, no bandwidth limits
+- **Best when**: Developing/testing, access from multiple devices
+
+#### ⚡ **Quick Setup Testing**: ngrok (Free)
+- **Cost**: $0/month (free tier)
+- **Benefits**: 2-minute setup, works instantly
+- **Limitations**: Random URLs, 40 connections/minute
+- **Best when**: Need to test something right now
+
+#### 🚫 **Avoid for Production**: LocalTunnel
+- **Cost**: $0/month
+- **Why avoid**: Unreliable, random URLs, can be slow
+- **Only use for**: 5-minute quick tests
+
+---
+
+### Cost-Saving Tips
+
+1. **Start with Cloudflare Tunnel** (~$10/year)
+   - Use a cheap domain from Namecheap or Porkbun
+   - Switch nameservers to Cloudflare (free)
+   - Set up tunnel (free)
+   - Total cost: Just the domain
+
+2. **Use Tailscale for Development** ($0)
+   - Perfect for testing before production
+   - Access from all your devices
+   - No bandwidth costs
+
+3. **Avoid ngrok Paid Plans**
+   - Free tier works fine for testing
+   - If you need custom domains, use Cloudflare instead
+   - Save $96-240/year
+
+4. **Buy Domains Wisely**
+   - .com domains: $8-15/year (good choice)
+   - Avoid expensive TLDs (.io = $30-40/year)
+   - Check Namecheap/Porkbun for deals
+   - First year often cheaper
+
+5. **One Domain, Multiple Services**
+   - With Cloudflare Tunnel, use subdomains:
+     - `livekit.yourdomain.com` (LiveKit)
+     - `monitoring.yourdomain.com` (Grafana)
+     - `app.yourdomain.com` (Your app)
+   - One $10/year domain = unlimited services
+
+### Monthly Cost Example (Small Production)
+
+**Budget Setup ($0.83/month)**:
+- Domain: $10/year = $0.83/month
+- Cloudflare Tunnel: $0/month (free)
+- **Total**: $0.83/month
+
+**ngrok Equivalent ($8-20/month)**:
+- ngrok Personal: $8/month
+- ngrok Pro: $20/month
+- **Total**: $8-20/month
+
+**Savings: $7-19/month = $84-228/year**
 
 ---
 
