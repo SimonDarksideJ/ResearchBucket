@@ -24,6 +24,22 @@ LiveKit is an open-source platform for building real-time video, audio, and data
 
 ---
 
+### [💰 Cost & Configuration Guide](09-cost-and-configuration-guide.md) **NEW!**
+
+**Essential reading!** Complete cost breakdown and external configuration requirements.
+
+**Contents**:
+
+- Detailed cost analysis for all deployment options
+- External service requirements (DNS, domains, SSL)
+- Setup links and step-by-step instructions
+- Cost-saving tips and recommendations
+- Comparison tables and use case examples
+
+**Best for**: Anyone concerned about costs or unclear about external requirements
+
+---
+
 ### [🐧 Linux Host Deployment](01-linux-host-deployment.md)
 
 Native deployment on Linux using systemd for service management.

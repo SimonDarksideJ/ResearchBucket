@@ -20,7 +20,8 @@ Comprehensive guides for deploying LiveKit Server across various platforms and a
 - [Load Balancing & Auto-Scaling](docs/livekit-deployment/05-load-balancing-autoscaling.md) - Advanced scaling patterns
 - [Hetzner Deployment (Docker + Caddy)](docs/livekit-deployment/06-hetzner-deployment.md) - Hetzner-focused quick path to HTTPS/WSS
 - [Hetzner Cost & Performance Analysis](docs/livekit-deployment/07-hetzner-cost-performance-analysis.md) - Comprehensive cost/performance breakdown with capacity planning
-- [Mac Deployment with Monitoring](docs/livekit-deployment/08-mac-deployment.md) - **NEW!** macOS deployment with external storage, monitoring dashboards, and automated scripts
+- [Mac Deployment with Monitoring](docs/livekit-deployment/08-mac-deployment.md) - macOS deployment with external storage, monitoring dashboards, and automated scripts
+- [Cost & Configuration Guide](docs/livekit-deployment/09-cost-and-configuration-guide.md) - **NEW!** Complete cost breakdown, external requirements, and setup instructions
 
 **Quick Start:**
 
