@@ -4,12 +4,345 @@
 
 This guide covers deploying LiveKit media server on Hetzner Cloud infrastructure with monitoring and management capabilities.
 
+## 💰 Cost Breakdown - Hetzner Deployment
+
+### What Hetzner Provides (Included in Server Price)
+
+| Feature | Included | Notes |
+|---------|----------|-------|
+| **Server Instance** | ✅ Yes | CX31: €11/month (~$12) |
+| **20TB Bandwidth** | ✅ Yes | Generous allowance |
+| **IPv4 & IPv6** | ✅ Yes | Public IP addresses |
+| **DDoS Protection** | ✅ Yes | Basic protection included |
+| **Snapshots** | ✅ Yes | Manual backups (€0.013/GB/month) |
+| **Firewall** | ✅ Yes | Free, managed via console |
+| **Monitoring** | ✅ Yes | Basic CPU/RAM/disk metrics |
+| **API Access** | ✅ Yes | For automation |
+
+### What Hetzner Does NOT Provide (You Must Configure)
+
+| Service | Hetzner Provides? | You Need | Cost |
+|---------|------------------|----------|------|
+| **DNS Hosting** | ❌ No | External DNS provider | $0-20/year |
+| **Domain Name** | ❌ No | Domain registrar | $6-15/year |
+| **SSL Certificates** | ❌ No | Let's Encrypt (via Caddy) | **FREE** |
+| **Email Notifications** | ❌ No | SendGrid/Mailgun/SMTP | $0-15/month |
+| **External Monitoring** | ❌ No | UptimeRobot/Pingdom | $0-10/month |
+| **CDN** | ❌ No | Cloudflare (optional) | **FREE** |
+
+### Total Monthly Cost Breakdown
+
+| Scenario | Hetzner Server | Domain | DNS | Monitoring | Total/Month |
+|----------|----------------|--------|-----|------------|-------------|
+| **Minimal (Recommended)** | €11 ($12) | $1 | **FREE** | **FREE** | **~$13/month** |
+| **With Paid DNS** | €11 ($12) | $1 | $2 | **FREE** | ~$15/month |
+| **With All Options** | €11 ($12) | $1 | $2 | $10 | ~$25/month |
+
+**Best Value Setup:**
+- Hetzner CX31: €11/month
+- Domain via Cloudflare: ~$9/year ($0.75/month)
+- Cloudflare DNS: FREE
+- Let's Encrypt SSL: FREE
+- Self-hosted monitoring (Grafana): FREE
+- **Total: ~$13/month**
+
+### Bandwidth Cost Comparison
+
+| Provider | Included | Overage Cost |
+|----------|----------|--------------|
+| **Hetzner** | 20TB | €1.19/TB (~$1.31) |
+| AWS | 1TB | $0.09/GB ($90/TB) |
+| DigitalOcean | 4TB | $0.01/GB ($10/TB) |
+| Azure | 100GB | $0.087/GB ($87/TB) |
+
+**Hetzner Advantage:** 20TB bandwidth makes it ideal for media servers. At 2GB/hour per participant, you can serve 10,000+ participant-hours per month!
+
 ## Prerequisites
 
-- Hetzner Cloud account
-- Domain name configured
-- SSH key pair generated
-- Basic Linux knowledge
+### What You Need Before Starting
+
+#### 1. Hetzner Cloud Account
+**Cost:** Free to create | **Required:** Yes
+
+**Setup:**
+1. Visit [https://www.hetzner.com/cloud](https://www.hetzner.com/cloud)
+2. Click "Sign Up"
+3. Verify email
+4. Add payment method (no charge until you create server)
+5. **First-time bonus:** €20 credit (if available)
+
+#### 2. Domain Name
+**Cost:** $6-15/year | **Required:** Yes (for HTTPS/production)
+
+**Where Hetzner Fits:**
+- ❌ Hetzner does NOT sell domains
+- ✅ Hetzner gives you IP address
+- ✅ YOU point your domain to that IP
+
+**Recommended Domain Registrars:**
+
+| Registrar | Cost/Year | DNS Included | Notes |
+|-----------|-----------|--------------|-------|
+| **Cloudflare** | ~$9 | ✅ FREE DNS | Best integration, at-cost pricing |
+| **Namecheap** | ~$9-13 | ✅ FREE DNS | Reliable, good support |
+| **Porkbun** | ~$6-10 | ✅ FREE DNS | Budget-friendly |
+| **Google Domains** | ~$12 | ✅ FREE DNS | Simple interface |
+
+**Setup Process:**
+1. Search for available domain (e.g., "mylivekit.com")
+2. Purchase domain
+3. Keep registrar's DNS or transfer to Cloudflare (recommended)
+4. You'll configure DNS records after server creation
+
+#### 3. SSH Key Pair
+**Cost:** Free | **Required:** Yes (for secure access)
+
+**Generate SSH Key (if you don't have one):**
+
+**On Mac/Linux:**
+```bash
+# Generate new SSH key
+ssh-keygen -t ed25519 -C "your_email@example.com"
+
+# Save to default location (~/.ssh/id_ed25519)
+# Set a passphrase (recommended)
+
+# View public key (you'll need this for Hetzner)
+cat ~/.ssh/id_ed25519.pub
+```
+
+**On Windows:**
+```powershell
+# Use PowerShell
+ssh-keygen -t ed25519 -C "your_email@example.com"
+
+# View public key
+type $env:USERPROFILE\.ssh\id_ed25519.pub
+```
+
+#### 4. Basic Linux Knowledge
+**Cost:** Free | **Required:** Helpful
+
+**Essential commands you'll use:**
+- `ssh` - Connect to server
+- `apt` - Install packages
+- `docker` - Manage containers
+- `nano` or `vim` - Edit files
+
+**Learning resources (free):**
+- [Linux Journey](https://linuxjourney.com/) - Interactive tutorial
+- [Ubuntu Server Guide](https://ubuntu.com/server/docs) - Official docs
+
+## DNS Configuration Guide
+
+### Understanding DNS for Hetzner Deployment
+
+**What Hetzner Provides:**
+- Public IPv4 address (e.g., `95.217.123.456`)
+- Public IPv6 address
+- Reverse DNS configuration (optional)
+
+**What Hetzner Does NOT Provide:**
+- DNS hosting for your domain
+- Domain registration
+- Automatic DNS setup
+
+**YOU Must Configure DNS** to point your domain to Hetzner's IP address.
+
+### DNS Setup Options
+
+#### Option 1: Cloudflare DNS (Recommended - FREE)
+
+**Why Cloudflare:**
+- ✅ Completely FREE
+- ✅ Fast global DNS (1.1.1.1)
+- ✅ DDoS protection included
+- ✅ Flexible SSL/TLS options
+- ✅ Can buy domain through them
+- ✅ Easy integration with Caddy
+
+**Setup Steps:**
+
+1. **Sign up for Cloudflare**
+   - Visit [https://dash.cloudflare.com/sign-up](https://dash.cloudflare.com/sign-up)
+   - Create free account
+   - No credit card required
+
+2. **Add Your Domain**
+   - Click "Add a Site"
+   - Enter your domain (e.g., "example.com")
+   - Choose FREE plan
+   - Click "Add Site"
+
+3. **Update Nameservers**
+   - Cloudflare will show you 2 nameservers:
+     ```
+     nova.ns.cloudflare.com
+     sid.ns.cloudflare.com
+     ```
+   - Go to your domain registrar (where you bought domain)
+   - Find "Nameservers" or "DNS Settings"
+   - Replace existing nameservers with Cloudflare's
+   - Save changes (propagation takes 5 min - 48 hours)
+
+4. **Add DNS Records** (After server creation)
+   
+   In Cloudflare dashboard → DNS → Records:
+   
+   ```
+   Type: A
+   Name: livekit (or @, for root domain)
+   IPv4: YOUR_HETZNER_IP
+   Proxy: OFF (gray cloud) - Important for LiveKit WebRTC!
+   TTL: Auto
+   ```
+   
+   ```
+   Type: A
+   Name: grafana
+   IPv4: YOUR_HETZNER_IP
+   Proxy: ON (orange cloud) - OK for Grafana
+   TTL: Auto
+   ```
+   
+   **Important:** Keep "Proxy" OFF for LiveKit (WebRTC needs direct connection)
+
+5. **Verify DNS Propagation**
+   ```bash
+   # Check if DNS is working
+   dig livekit.yourdomain.com
+   
+   # Should show your Hetzner IP
+   nslookup livekit.yourdomain.com
+   ```
+
+**Documentation:** [Cloudflare DNS Setup](https://developers.cloudflare.com/dns/zone-setups/full-setup/)
+
+#### Option 2: Registrar's DNS (Usually FREE)
+
+Most domain registrars include free DNS hosting.
+
+**Setup Steps:**
+
+1. **Login to your registrar** (Namecheap, Google Domains, etc.)
+
+2. **Find DNS Management** section
+
+3. **Add A Records:**
+   ```
+   Host: livekit
+   Type: A
+   Value: YOUR_HETZNER_IP
+   TTL: 300 (5 minutes)
+   
+   Host: grafana
+   Type: A  
+   Value: YOUR_HETZNER_IP
+   TTL: 300
+   ```
+
+4. **Wait for propagation** (usually 5-30 minutes)
+
+5. **Verify:**
+   ```bash
+   dig livekit.yourdomain.com
+   ```
+
+#### Option 3: Hetzner DNS (FREE)
+
+Hetzner offers free DNS hosting for domains pointed to Hetzner servers.
+
+**Setup Steps:**
+
+1. **Login to Hetzner Cloud Console**
+   - Visit [https://console.hetzner.cloud](https://console.hetzner.cloud)
+
+2. **Go to DNS Section**
+   - Click "DNS" in left sidebar
+   - Click "Add Zone"
+
+3. **Add Your Domain**
+   - Enter domain name
+   - Click "Add Zone"
+
+4. **Update Nameservers at Registrar**
+   
+   Point to Hetzner nameservers:
+   ```
+   hydrogen.ns.hetzner.com
+   oxygen.ns.hetzner.com
+   helium.ns.hetzner.de
+   ```
+
+5. **Add DNS Records in Hetzner Console:**
+   ```
+   Name: livekit
+   Type: A
+   Value: YOUR_HETZNER_IP
+   TTL: 300
+   
+   Name: grafana
+   Type: A
+   Value: YOUR_HETZNER_IP  
+   TTL: 300
+   ```
+
+**Documentation:** [Hetzner DNS Console](https://docs.hetzner.com/dns-console/)
+
+### SSL/TLS Certificates (Let's Encrypt via Caddy)
+
+**Good News:** SSL certificates are FREE and automatic!
+
+**How it works:**
+1. Caddy web server is included in deployment
+2. Caddy automatically requests SSL from Let's Encrypt
+3. Certificates auto-renew every 90 days
+4. Zero configuration needed (if DNS is correct)
+
+**Requirements:**
+- DNS must point to your server (A records configured)
+- Ports 80 and 443 must be open (firewall configured)
+- Domain must be publicly accessible
+
+**Caddy handles:**
+- ✅ Certificate request
+- ✅ Certificate installation
+- ✅ HTTPS redirect (HTTP → HTTPS)
+- ✅ Certificate renewal
+- ✅ OCSP stapling
+
+**No cost, no manual work required!**
+
+### Complete DNS Configuration Example
+
+**Scenario:** You own `livekit.example.com` and created Hetzner server with IP `95.217.123.456`
+
+**DNS Records to Add:**
+
+| Type | Name | Value | TTL | Purpose |
+|------|------|-------|-----|---------|
+| A | livekit | 95.217.123.456 | 300 | LiveKit server |
+| A | grafana | 95.217.123.456 | 300 | Monitoring dashboard |
+| A | @ or root | 95.217.123.456 | 300 | Main domain (optional) |
+
+**After DNS setup:**
+- `https://livekit.example.com` → LiveKit WebRTC server
+- `https://grafana.example.com` → Grafana monitoring
+- Caddy auto-configures SSL for both
+
+**Verification:**
+```bash
+# Check DNS resolution
+dig livekit.example.com +short
+# Should output: 95.217.123.456
+
+dig grafana.example.com +short
+# Should output: 95.217.123.456
+
+# Test HTTPS (after deployment)
+curl -I https://livekit.example.com
+# Should show: HTTP/2 200
+```
 
 ## Server Specifications
 
@@ -79,21 +412,92 @@ grafana.yourdomain.com    A     SERVER_IP
 
 ## Quick Start Deployment
 
+**Prerequisites Checklist:**
+- ✅ Hetzner Cloud account created
+- ✅ Domain name purchased (see recommendations above)
+- ✅ DNS provider chosen (Cloudflare recommended)
+- ✅ SSH key generated and added to Hetzner
+- ✅ Credit card/payment method added to Hetzner
+
+### Step-by-Step Deployment
+
 ### 1. Create Hetzner Server
+
+**Option A: Via Web Console (Easiest)**
+
+1. Login to [https://console.hetzner.cloud](https://console.hetzner.cloud)
+2. Click "New Project" → Name it (e.g., "LiveKit Production")
+3. Click "Add Server"
+4. Choose options:
+   - **Location:** Falkenstein (Germany) - Recommended for EU
+   - **Image:** Ubuntu 22.04
+   - **Type:** Standard - CX31 (2 vCPU, 8GB RAM)
+   - **Networking:** IPv4 + IPv6
+   - **SSH Keys:** Select your key (or add new one)
+   - **Volumes:** None (not needed)
+   - **Firewalls:** Create new (configure after server creation)
+5. **Name:** livekit-prod
+6. Click "Create & Buy Now"
+7. **Note the IP address** shown (e.g., 95.217.123.456)
+
+**Cost:** €11/month (~$12) billed hourly (~€0.015/hour)
+
+**Option B: Via CLI (Advanced)**
+
 ```bash
-# Using Hetzner Cloud CLI (hcloud)
+# Install Hetzner CLI
+brew install hcloud  # Mac
+# or
+wget https://github.com/hetznercloud/cli/releases/latest/download/hcloud-linux-amd64.tar.gz
+tar -xvf hcloud-linux-amd64.tar.gz
+
+# Authenticate (get token from console.hetzner.cloud → Security → API Tokens)
+hcloud context create livekit-project
+
+# Create server
 hcloud server create \
   --name livekit-prod \
   --type cx31 \
   --image ubuntu-22.04 \
   --location fsn1 \
   --ssh-key YOUR_KEY_NAME
+
+# Note the IP address from output
 ```
 
-### 2. Initial Server Setup
+### 2. Configure DNS (Do This Now!)
+
+**Before proceeding, configure DNS to point to your Hetzner IP.**
+
+**Using Cloudflare (Recommended):**
+
+1. Go to Cloudflare DNS dashboard
+2. Add A records:
+   ```
+   Type: A | Name: livekit | IPv4: YOUR_HETZNER_IP | Proxy: OFF
+   Type: A | Name: grafana | IPv4: YOUR_HETZNER_IP | Proxy: OFF
+   ```
+3. Wait 2-5 minutes for propagation
+
+**Using Other DNS:**
+- Add same A records in your DNS provider
+- Wait for DNS propagation (check with `dig livekit.yourdomain.com`)
+
+**Verify DNS:**
+```bash
+# Check DNS resolution
+dig livekit.yourdomain.com +short
+
+# Should output your Hetzner IP
+# If not, wait a few minutes and try again
+```
+
+**Why Now?** Caddy needs DNS to be working to issue SSL certificates. Setting up DNS now means SSL will work immediately after deployment.
+
+### 3. Initial Server Setup
 ```bash
 # Connect to server
-ssh root@YOUR_SERVER_IP
+ssh root@YOUR_HETZNER_IP
 
 # Update system
 apt update && apt upgrade -y
@@ -109,26 +513,149 @@ ufw allow 7880:7881/tcp
 ufw allow 443/udp
 ufw allow 50000:60000/udp
 ufw --force enable
+
+# Verify firewall
+ufw status
 ```
 
-### 3. Install Docker
+### 4. Install Docker
 ```bash
+# Install Docker using official script
 curl -fsSL https://get.docker.com -o get-docker.sh
 sh get-docker.sh
 
 # Install Docker Compose
 apt install -y docker-compose-plugin
+
+# Verify installations
+docker --version
+docker compose version
 ```
 
-### 4. Deploy Using Deployment Scripts
+### 5. Deploy Using Deployment Scripts
+
+**Option A: Automated Deployment (Recommended)**
+
 ```bash
 # Clone deployment repository
-git clone https://github.com/YOUR_USERNAME/ResearchBucket.git
+git clone https://github.com/SimonDarksideJ/ResearchBucket.git
 cd ResearchBucket/deployment-tools
 
 # Run deployment script
 ./scripts/deploy.sh --platform linux --env production
+
+# Follow prompts to enter:
+# - Your domain name (e.g., livekit.yourdomain.com)
+# - Email for Let's Encrypt notifications
 ```
+
+**Option B: Manual Deployment**
+
+See "Manual Deployment Steps" section below for detailed instructions.
+
+### 6. Verify Deployment
+
+**Check Services:**
+```bash
+cd /opt/livekit
+docker compose ps
+
+# All services should show "Up"
+```
+
+**Test Endpoints:**
+```bash
+# Test LiveKit
+curl http://localhost:7880
+
+# Test SSL (wait 2-3 minutes after deployment)
+curl -I https://livekit.yourdomain.com
+# Should show: HTTP/2 200
+
+# Test Grafana
+curl -I https://grafana.yourdomain.com
+# Should show: HTTP/2 200
+```
+
+**Access Services:**
+- LiveKit: `https://livekit.yourdomain.com`
+- Grafana: `https://grafana.yourdomain.com` (login: admin / check deployment output)
+- Prometheus: `http://YOUR_IP:9090` (only accessible from your IP if firewall configured)
+
+### 7. Post-Deployment Security
+
+```bash
+# Change Grafana password immediately
+docker compose exec grafana grafana-cli admin reset-admin-password YOUR_NEW_PASSWORD
+
+# Restrict monitoring access to your IP only
+ufw delete allow 3000/tcp
+ufw delete allow 9090/tcp
+ufw allow from YOUR_HOME_IP to any port 3000 proto tcp
+ufw allow from YOUR_HOME_IP to any port 9090 proto tcp
+ufw reload
+
+# Create regular backups
+./scripts/backup.sh --compress --destination /root/backups
+```
+
+## What Hetzner Manages vs What You Configure
+
+### ✅ Hetzner Manages (Automatic)
+
+| Feature | Hetzner Responsibility | Your Action |
+|---------|----------------------|-------------|
+| **Hardware** | Physical servers, networking | None - it just works |
+| **Network** | 1Gbps uplink, 20TB bandwidth | None - included |
+| **IP Addresses** | IPv4 + IPv6 assignment | Use provided IPs |
+| **DDoS Protection** | Basic protection | None - automatic |
+| **Data Center** | Power, cooling, security | Choose location at creation |
+| **Backups (Snapshots)** | Storage infrastructure | Enable/schedule in console |
+
+### ⚙️ You Must Configure
+
+| Feature | Your Responsibility | Tools/Method |
+|---------|-------------------|--------------|
+| **Operating System** | Install, update, patch | Ubuntu via apt |
+| **Firewall Rules** | Configure ports | UFW or Hetzner Cloud Firewall |
+| **DNS Records** | Point domain to IP | Your DNS provider |
+| **SSL Certificates** | Setup (automated by Caddy) | Let's Encrypt via Caddy |
+| **Applications** | Install, configure | Docker Compose |
+| **Monitoring** | Setup dashboards | Grafana/Prometheus |
+| **Backups** | Schedule and verify | Scripts or Hetzner Snapshots |
+| **Security Updates** | Apply regularly | `apt update && apt upgrade` |
+
+### 🔄 Hybrid (Hetzner Provides Tools, You Execute)
+
+| Feature | Hetzner Provides | You Do |
+|---------|-----------------|---------|
+| **Firewall** | Cloud Firewall service (free) | Configure rules in console |
+| **Load Balancer** | Service (€5.90/month) | Create and configure |
+| **Volumes** | Block storage (€0.05/GB/month) | Attach and mount |
+| **Networks** | Private networking (free) | Create and attach |
+| **Snapshots** | Snapshot functionality (€0.013/GB/month) | Create and manage |
+
+### Summary: Hetzner is IaaS (Infrastructure as a Service)
+
+**What this means:**
+- Hetzner gives you: Server, IP, bandwidth, network
+- You handle: Everything else (OS, apps, DNS, SSL, monitoring)
+- **But:** Our deployment scripts automate 90% of the setup!
+
+**Think of it like:**
+- 🏢 **Hetzner** = Building owner (provides space, utilities)
+- 👨‍💻 **You** = Tenant (furnish, decorate, maintain)
+- 📦 **Our Scripts** = Moving company (automates setup)
+
+**Comparison:**
+
+| Service Type | Example | What They Manage | What You Manage |
+|--------------|---------|------------------|-----------------|
+| **IaaS** | Hetzner, AWS EC2 | Hardware, network | OS, apps, everything |
+| **PaaS** | Heroku, Railway | Hardware, OS, runtime | Just your app |
+| **SaaS** | Zoom, Slack | Everything | Just use it |
+
+**Hetzner = IaaS** → Most control, most responsibility, lowest cost
 
 ## Manual Deployment Steps
 

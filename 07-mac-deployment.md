@@ -24,6 +24,80 @@ Complete end-to-end solution for deploying LiveKit media server on macOS with ex
 - **Network**: Stable internet connection
 - **Domain** (optional): For custom domain via Cloudflare Tunnel
 
+## 💰 Cost Breakdown - Mac Deployment
+
+### Total Cost: **$0/month** (Free with optional paid upgrades)
+
+#### Required Components (All FREE)
+
+| Component | Cost | Setup Link | Notes |
+|-----------|------|------------|-------|
+| **macOS** | Included | N/A | Requires macOS 11.0+ |
+| **Homebrew** | Free | [brew.sh](https://brew.sh) | Package manager for Mac |
+| **Docker Desktop** | Free | [docker.com/products/docker-desktop](https://www.docker.com/products/docker-desktop) | Free for personal use |
+| **LiveKit Server** | Free | [livekit.io](https://livekit.io) | Open source, self-hosted |
+| **Prometheus** | Free | [prometheus.io](https://prometheus.io) | Open source monitoring |
+| **Grafana** | Free | [grafana.com](https://grafana.com) | Open source dashboards |
+| **Loki** | Free | [grafana.com/oss/loki](https://grafana.com/oss/loki) | Log aggregation |
+| **Caddy** | Free | [caddyserver.com](https://caddyserver.com) | Open source web server |
+
+#### Optional Public Access (FREE Options Available)
+
+| Component | Free Tier | Paid Options | Setup Link |
+|-----------|-----------|--------------|------------|
+| **Cloudflare Tunnel** | ✅ Free unlimited | N/A | [developers.cloudflare.com/cloudflare-one/connections/connect-apps](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps) |
+| **ngrok** | ✅ Free (1 tunnel, random URL) | $8/month (custom domain) | [ngrok.com/pricing](https://ngrok.com/pricing) |
+| **localhost.run** | ✅ Free (SSH-based) | N/A | [localhost.run](https://localhost.run) |
+
+**Recommended:** Cloudflare Tunnel (completely free, unlimited bandwidth, stable URLs with custom domain support)
+
+#### Domain Name (Optional for Custom URLs)
+
+| Registrar | Cost/Year | Notes |
+|-----------|-----------|-------|
+| **Cloudflare Registrar** | ~$9-12/year | At-cost pricing, no markup |
+| **Namecheap** | ~$9-15/year | Popular, good support |
+| **Google Domains** | ~$12/year | Simple interface |
+| **Porkbun** | ~$6-10/year | Budget-friendly |
+
+**Note:** Domain only needed if you want custom branded URLs (e.g., `livekit.yourdomain.com` instead of `random-subdomain.trycloudflare.com`)
+
+#### External Storage
+
+| Option | Cost | Notes |
+|--------|------|-------|
+| **USB SSD (256GB)** | $30-50 one-time | Samsung T7, SanDisk Extreme |
+| **USB HDD (1TB)** | $50-70 one-time | Slower but more storage |
+| **Existing External Drive** | $0 | Use what you have |
+
+**Recommended:** 256GB SSD (~$40) sufficient for development/testing
+
+#### Bandwidth Costs
+
+**Mac Deployment:** Your home internet (already paying for it)
+- Typical usage: 2-4 Mbps per video participant
+- 10-person meeting = 20-40 Mbps upload needed
+- Cloudflare Tunnel bandwidth: **FREE and unlimited**
+
+### Cost Comparison: Mac vs Cloud Hosting
+
+| Duration | Mac (Home) | Hetzner Cloud | AWS Lightsail | DigitalOcean |
+|----------|------------|---------------|---------------|--------------|
+| **First Month** | $0 | €11 (~$12) | $40 | $24 |
+| **6 Months** | $0 | €66 (~$72) | $240 | $144 |
+| **1 Year** | $0 | €132 (~$145) | $480 | $288 |
+
+**Mac Advantage:** Perfect for development, testing, and small-scale production (5-20 concurrent users)
+
+### When to Upgrade to Cloud Hosting
+
+Consider cloud hosting when:
+- Need 24/7 uptime (Mac sleeps/restarts)
+- Bandwidth exceeds home internet capacity (>50 concurrent users)
+- Need geographic distribution (EU/Asia users)
+- Require enterprise SLA guarantees
+- Home internet upload speed <50 Mbps
+
 ## Architecture
 
 ```
@@ -98,6 +172,229 @@ The installation script will:
 7. Start Docker containers
 8. Set up monitoring dashboards
 9. Display access URLs and credentials
+
+## 🔧 External Components Setup Guide
+
+If you prefer manual installation or want to understand each component:
+
+### 1. Install Homebrew (Package Manager)
+
+**Cost:** Free | **Required:** Yes
+
+```bash
+# Install Homebrew
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# For Apple Silicon (M1/M2), add to PATH
+echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
+# Verify installation
+brew --version
+```
+
+**Documentation:** [https://brew.sh](https://brew.sh)
+
+### 2. Install Docker Desktop
+
+**Cost:** Free (Personal use) | **Required:** Yes
+
+**Option A: Download from Website (Recommended)**
+1. Visit [https://www.docker.com/products/docker-desktop](https://www.docker.com/products/docker-desktop)
+2. Click "Download for Mac"
+3. Choose:
+   - **Apple Silicon** (M1/M2/M3 Macs): ARM version
+   - **Intel Macs**: Intel version
+4. Open downloaded `.dmg` file
+5. Drag Docker to Applications
+6. Launch Docker Desktop
+7. Complete setup wizard (create account optional)
+8. Verify: Docker icon appears in menu bar
+
+**Option B: Install via Homebrew**
+```bash
+brew install --cask docker
+
+# Launch Docker Desktop
+open -a Docker
+
+# Wait for Docker to start (check menu bar icon)
+```
+
+**Resource Allocation (Important!):**
+1. Open Docker Desktop
+2. Go to Settings (gear icon)
+3. Resources tab:
+   - **CPUs:** Allocate 50-75% of available cores
+   - **Memory:** Allocate 4-8GB (depending on your Mac's RAM)
+   - **Disk:** Set to external drive if possible
+4. Click "Apply & Restart"
+
+**Documentation:** [https://docs.docker.com/desktop/mac/install/](https://docs.docker.com/desktop/mac/install/)
+
+### 3. Install Required CLI Tools
+
+**Cost:** All Free | **Required:** Yes
+
+```bash
+# Install jq (JSON processor)
+brew install jq
+
+# Install yq (YAML processor)
+brew install yq
+
+# Install wget (file downloader)
+brew install wget
+
+# Verify installations
+jq --version
+yq --version
+wget --version
+```
+
+### 4. Setup Cloudflare Tunnel (For Public Access)
+
+**Cost:** Free | **Required:** Only for public access
+
+**Step 1: Install cloudflared**
+```bash
+# Install via Homebrew
+brew install cloudflare/cloudflare/cloudflared
+
+# Verify installation
+cloudflared --version
+```
+
+**Step 2: Authenticate with Cloudflare**
+```bash
+# Login (opens browser for authentication)
+cloudflared tunnel login
+
+# This creates ~/.cloudflared/cert.pem
+```
+
+**Step 3: Create a Tunnel**
+```bash
+# Create tunnel (replace 'my-livekit' with your name)
+cloudflared tunnel create my-livekit
+
+# Note the Tunnel ID from output
+```
+
+**Step 4: Configure DNS (If using custom domain)**
+
+**Option A: Using Cloudflare DNS (Easiest)**
+1. Transfer your domain to Cloudflare (free)
+2. Or change nameservers to Cloudflare:
+   - Visit your domain registrar
+   - Update nameservers to:
+     - `nova.ns.cloudflare.com`
+     - `sid.ns.cloudflare.com`
+3. In Cloudflare dashboard:
+   - DNS → Add record
+   - Type: CNAME
+   - Name: livekit (or subdomain of choice)
+   - Target: [TUNNEL-ID].cfargotunnel.com
+   - Proxy: Enabled (orange cloud)
+
+**Option B: Using Other DNS Provider**
+1. Add CNAME record:
+   ```
+   livekit.yourdomain.com → [TUNNEL-ID].cfargotunnel.com
+   ```
+2. May need to disable proxy/CDN features
+
+**Step 5: Run Tunnel**
+```bash
+# Quick tunnel (random URL, no domain needed)
+cloudflared tunnel --url http://localhost:7880
+
+# Or with custom domain (requires DNS setup)
+cloudflared tunnel route dns my-livekit livekit.yourdomain.com
+cloudflared tunnel run my-livekit
+```
+
+**Documentation:** 
+- [Cloudflare Tunnel Guide](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps)
+- [DNS Setup](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/routing-to-tunnel/dns)
+
+**Alternative Options (If you don't want Cloudflare):**
+
+**ngrok (Free tier available)**
+```bash
+# Install
+brew install ngrok/ngrok/ngrok
+
+# Authenticate (sign up at ngrok.com)
+ngrok authtoken YOUR_AUTH_TOKEN
+
+# Start tunnel
+ngrok http 7880
+
+# Gives you: https://random-id.ngrok.io
+```
+
+**localhost.run (No signup required)**
+```bash
+# Start tunnel via SSH
+ssh -R 80:localhost:7880 localhost.run
+
+# Gives you: https://random-id.lhr.rocks
+```
+
+### 5. Domain Registration (Optional)
+
+**Cost:** $6-15/year | **Required:** Only for branded URLs
+
+**Recommended Registrars:**
+
+1. **Cloudflare Registrar** - [https://www.cloudflare.com/products/registrar/](https://www.cloudflare.com/products/registrar/)
+   - At-cost pricing (~$9/year for .com)
+   - Free privacy protection
+   - Integrated with Cloudflare Tunnel
+   - Best if using Cloudflare services
+
+2. **Namecheap** - [https://www.namecheap.com](https://www.namecheap.com)
+   - Competitive pricing (~$9-13/year)
+   - Free WhoisGuard privacy
+   - Good support
+
+3. **Porkbun** - [https://porkbun.com](https://porkbun.com)
+   - Budget-friendly (~$6-10/year)
+   - Free SSL, privacy protection
+   - Simple interface
+
+**Setup Steps:**
+1. Search for available domain
+2. Purchase domain (~$6-15/year)
+3. Configure nameservers (if using Cloudflare)
+4. Add DNS records (CNAME for tunnel)
+5. Wait for DNS propagation (5 minutes - 48 hours)
+
+### 6. External Storage Setup
+
+**Cost:** $30-70 one-time | **Required:** Recommended
+
+**Recommended External Drives:**
+
+| Brand | Model | Capacity | Speed | Price | Link |
+|-------|-------|----------|-------|-------|------|
+| Samsung | T7 SSD | 500GB | 1050 MB/s | ~$50 | [amazon.com/dp/B0874XN4D8](https://www.amazon.com/dp/B0874XN4D8) |
+| SanDisk | Extreme SSD | 500GB | 1050 MB/s | ~$60 | [amazon.com/dp/B08GTYFC37](https://www.amazon.com/dp/B08GTYFC37) |
+| WD | My Passport HDD | 1TB | 120 MB/s | ~$50 | [amazon.com/dp/B0BQK9JQMW](https://www.amazon.com/dp/B0BQK9JQMW) |
+
+**Setup Instructions:**
+1. Connect drive to Mac
+2. Open Disk Utility
+3. Format as "APFS" or "Mac OS Extended (Journaled)"
+4. Name it (e.g., "LiveKitStorage")
+5. Verify mount point: `/Volumes/LiveKitStorage`
+
+**Storage Requirements:**
+- **Minimum:** 50GB
+- **Recommended:** 100GB+ for logs and recordings
+- **Per hour of recording:** ~1-2GB (720p video)
+
 
 ### 3. Access Services
 
