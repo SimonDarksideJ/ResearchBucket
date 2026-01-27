@@ -60,6 +60,210 @@ Optional (only if you enable TURN on the same host):
 
 ---
 
+## What Hetzner Provides vs. What You Configure
+
+Understanding what Hetzner handles and what you need to set up yourself:
+
+### ✅ What Hetzner Provides
+
+| Component | Details |
+|-----------|---------|
+| **Server/VM** | Virtual or dedicated server hardware |
+| **Public IP** | Static IPv4 and/or IPv6 address |
+| **Network Bandwidth** | 20 TB/month included (Cloud), unlimited (Dedicated) |
+| **Firewall** | Basic firewall rules (you configure) |
+| **Server Access** | SSH access, root credentials |
+| **Data Center** | Physical infrastructure, power, cooling |
+| **Backups** | Optional paid backups |
+
+### 🔧 What You Need to Configure
+
+| Component | Your Responsibility | This Guide Covers |
+|-----------|---------------------|-------------------|
+| **DNS Records** | Point your domain to server IP | ✅ Yes (Step 3) |
+| **Operating System** | Install/update Ubuntu | ✅ Yes (Step 1) |
+| **Docker** | Install Docker Engine | ✅ Yes (Step 4) |
+| **Firewall Rules** | Open required ports | ✅ Yes (Step 5) |
+| **LiveKit Config** | Create configuration files | ✅ Yes (Step 6) |
+| **SSL Certificates** | Obtain/renew certificates | ✅ Automatic (Caddy) |
+| **Reverse Proxy** | Set up Caddy | ✅ Yes (Step 7-8) |
+| **Domain Name** | Own/purchase domain | ⚠️ External |
+| **DNS Hosting** | Host DNS records | ⚠️ External (any provider) |
+
+### ❌ What Hetzner Does NOT Provide
+
+- Domain name registration (buy separately)
+- DNS hosting (use any DNS provider)
+- SSL certificates (but Caddy gets them automatically)
+- Pre-configured LiveKit (you install it)
+- Application support (community/self-support)
+
+---
+
+## External Configuration Requirements
+
+This section explains all the external services and configurations you'll need.
+
+### 1. Domain Name
+
+**What is it?**
+- A domain name like `media.myservice.net` that points to your server
+- Required for SSL/TLS certificates (HTTPS/WSS)
+- Makes your server accessible via a memorable name
+
+**Where to get one:**
+- [Namecheap](https://namecheap.com) - $9-12/year (.com)
+- [Google Domains](https://domains.google) - $12/year (.com)  
+- [Cloudflare Registrar](https://www.cloudflare.com/products/registrar/) - $8-9/year (at-cost)
+- [Porkbun](https://porkbun.com) - $8-10/year (.com)
+- **Use existing domain** - Can use a subdomain of one you already own
+
+**Cost:**
+- .com domains: $8-15/year
+- .net domains: $10-18/year
+- .io domains: $30-40/year (avoid if budget-conscious)
+
+**💡 Recommendation**: Buy a `.com` or `.net` domain from Namecheap or Porkbun ($8-12/year)
+
+### 2. DNS Management (You Manage Your Own)
+
+**What is it?**
+- DNS (Domain Name System) translates your domain to your server's IP address
+- You need to create an "A record" pointing to your Hetzner server
+- Completely separate from Hetzner - use any DNS provider
+
+**DNS Provider Options:**
+
+#### Option A: Cloudflare DNS (Recommended, Free)
+**Cost**: ✅ Free forever  
+**Pros**: Fast, reliable, DDoS protection, easy interface  
+**Cons**: Need to change nameservers  
+**Setup Link**: [dash.cloudflare.com](https://dash.cloudflare.com)
+
+**Setup:**
+1. Sign up at [dash.cloudflare.com](https://dash.cloudflare.com)
+2. Add your domain
+3. Change nameservers at your domain registrar
+4. Create A record: `media.myservice.net` → `your_server_ip`
+
+#### Option B: Domain Registrar's DNS
+**Cost**: ✅ Usually included with domain  
+**Pros**: Already set up, no nameserver changes  
+**Cons**: Often slower, fewer features
+
+**Setup:**
+1. Log into your domain registrar (Namecheap, Google, etc.)
+2. Find DNS settings or "DNS Management"
+3. Create A record: `media.myservice.net` → `your_server_ip`
+
+#### Option C: Hetzner DNS
+**Cost**: ✅ Free  
+**Pros**: Integrated with Hetzner, simple  
+**Cons**: Less features than Cloudflare  
+**Setup Link**: [dns.hetzner.com](https://dns.hetzner.com)
+
+**Setup:**
+1. Go to [dns.hetzner.com](https://dns.hetzner.com)
+2. Add your domain
+3. Update nameservers at registrar:
+   - `hydrogen.ns.hetzner.com`
+   - `oxygen.ns.hetzner.com`
+   - `helium.ns.hetzner.de`
+4. Create A record in Hetzner DNS console
+
+#### Option D: Route 53 (AWS)
+**Cost**: ~$0.50/month + queries  
+**Pros**: Highly reliable, programmatic access  
+**Cons**: Not free, more complex
+
+**💡 Recommendation**: Use **Cloudflare DNS** (free, fast, easy) or your **registrar's DNS** (already set up)
+
+### 3. SSL/TLS Certificates (Automatic!)
+
+**What is it?**
+- HTTPS requires an SSL certificate to encrypt traffic
+- LiveKit requires WSS (WebSocket Secure) which also needs SSL
+- Without this, modern browsers won't allow media access
+
+**How it works in this guide:**
+- ✅ **Fully automatic** - Caddy handles everything
+- Caddy uses Let's Encrypt (free certificate authority)
+- Certificates auto-renew every 90 days
+- No manual work required after initial setup
+
+**Requirements for automatic SSL:**
+1. Valid domain name pointing to your server
+2. Port 80 accessible (for Let's Encrypt verification)
+3. Port 443 accessible (for HTTPS traffic)
+4. DNS propagated (A record resolves correctly)
+
+**Cost**: ✅ Free (Let's Encrypt is free forever)
+
+---
+
+## Complete External Access Setup
+
+Here's everything you need for external access in one place:
+
+### Checklist
+
+- [ ] **Domain purchased** (or using existing subdomain)
+- [ ] **DNS A record created** (pointing to server IP)
+- [ ] **DNS propagated** (verified with `nslookup`)
+- [ ] **Hetzner server provisioned** (Ubuntu 22.04)
+- [ ] **Firewall ports open** (80, 443, 50000-60000)
+- [ ] **Caddy configured** (with your domain in Caddyfile)
+- [ ] **SSL certificate obtained** (automatic via Caddy)
+- [ ] **LiveKit accessible** (test with `curl https://yourdomain/health`)
+
+### Full Setup Summary
+
+1. **Buy domain** ($10-15/year) or use existing
+2. **Point DNS** to Hetzner server IP (free, 5 minutes)
+3. **Configure Hetzner firewall** (free, built-in)
+4. **Install Docker** (free, this guide)
+5. **Deploy LiveKit + Caddy** (free, this guide)
+6. **Caddy gets SSL cert** (automatic, free)
+7. **Access via** `https://media.yourdomain.com`
+
+**Total external costs**: $10-15/year (domain only)
+
+### What You DON'T Need
+
+❌ Load balancer (unless scaling beyond 1 server)  
+❌ CDN (LiveKit serves direct)  
+❌ VPN (ports are publicly accessible)  
+❌ SSL certificate service (Caddy + Let's Encrypt is free)  
+❌ DDoS protection (basic included, Cloudflare DNS optional)  
+❌ Monitoring service (optional, can add Grafana)
+
+---
+
+## Cost Summary
+
+### One-Time Costs
+- Domain name: $8-15 (annual, but paid once per year)
+
+### Monthly Costs
+- Hetzner Cloud VPS: From €4.15/month (~$4.50)
+- DNS hosting: Free (use Cloudflare, Hetzner, or registrar)
+- SSL certificates: Free (Let's Encrypt)
+- Bandwidth: Included (20 TB/month on Cloud)
+
+### Total First Year
+- Domain: $10
+- Hetzner (12 months): €50-60 (~$55-65)
+- **Total**: ~$65-75/year
+
+### Compared to Alternatives
+- AWS/GCP equivalent: $100-200/year
+- Managed LiveKit: $200-500/year
+- Other VPS: $60-120/year
+
+**Hetzner is one of the most cost-effective options for self-hosting LiveKit.**
+
+---
+
 ## Step 1: Provision the Hetzner Server
 
 1. Create a server in Hetzner Cloud.
@@ -92,7 +296,179 @@ Keep this value; you’ll use it for DNS and (optionally) LiveKit node IP.
 
 ---
 
-## Step 3: Point DNS to the Server
+## Step 3: Point DNS to the Server (Detailed)
+
+This is the most important external configuration step. Follow carefully.
+
+### Overview
+
+Your DNS points `media.myservice.net` to the **public IP** of the Hetzner server. Once configured:
+- Caddy listens on ports 80/443
+- Forwards traffic to LiveKit container
+- Automatically obtains SSL certificate from Let's Encrypt
+
+### DNS Requirements
+
+Create these DNS records at your DNS provider:
+
+- **A record**: `media.myservice.net` → `<YOUR_SERVER_IPV4>`
+- (Optional) **AAAA record**: `media.myservice.net` → `<YOUR_SERVER_IPV6>`
+
+### Detailed DNS Setup by Provider
+
+#### Cloudflare (Recommended)
+
+1. **Sign up / Log in**
+   - Go to [dash.cloudflare.com](https://dash.cloudflare.com)
+   - Create account or log in
+
+2. **Add Your Domain**
+   - Click "Add a Site"
+   - Enter your domain (e.g., `myservice.net`)
+   - Choose "Free" plan
+   - Click "Continue"
+
+3. **Change Nameservers**
+   - Cloudflare shows you 2 nameservers
+   - Go to your domain registrar (where you bought domain)
+   - Update nameservers to Cloudflare's
+   - Wait 5-60 minutes for propagation
+   - Return to Cloudflare, click "Done, check nameservers"
+
+4. **Create A Record**
+   - Click on DNS → Records
+   - Click "Add record"
+   - Type: **A**
+   - Name: **media** (or whatever subdomain you want)
+   - IPv4 address: **your_server_ip** (from Step 2)
+   - Proxy status: **🟠 DNS only** (IMPORTANT - turn off proxy!)
+   - TTL: **Auto**
+   - Click "Save"
+
+**Why DNS only?**: WebRTC needs direct UDP access. Cloudflare proxy only supports TCP/HTTP/HTTPS, not UDP.
+
+#### Namecheap
+
+1. **Log into Namecheap**
+   - Go to [namecheap.com](https://namecheap.com)
+   - Log into your account
+
+2. **Manage Domain**
+   - Domain List → Find your domain
+   - Click "Manage"
+
+3. **Advanced DNS**
+   - Click "Advanced DNS" tab
+
+4. **Add A Record**
+   - Click "Add New Record"
+   - Type: **A Record**
+   - Host: **media** (for media.yourdomain.com)
+   - Value: **your_server_ip**
+   - TTL: **Automatic**
+   - Click the checkmark to save
+
+5. **Wait for Propagation**
+   - Usually takes 5-30 minutes
+   - Can take up to 24 hours
+
+#### Hetzner DNS
+
+1. **Go to Hetzner DNS**
+   - Visit [dns.hetzner.com](https://dns.hetzner.com)
+   - Log in with Hetzner account
+
+2. **Add Zone**
+   - Click "Add Zone"
+   - Enter your domain
+   - Click "Continue"
+
+3. **Update Nameservers**
+   - Hetzner DNS shows nameservers:
+     - `hydrogen.ns.hetzner.com`
+     - `oxygen.ns.hetzner.com`
+     - `helium.ns.hetzner.de`
+   - Go to your domain registrar
+   - Update nameservers to these
+   - Wait for propagation
+
+4. **Add A Record**
+   - Click on your zone
+   - Click "Add Record"
+   - Name: **media**
+   - Type: **A**
+   - Value: **your_server_ip**
+   - TTL: **86400** (24 hours)
+   - Click "Create Record"
+
+#### Using Registrar's DNS (Generic)
+
+If your domain is at Namecheap, Google Domains, GoDaddy, etc., you can use their DNS:
+
+1. **Log into registrar**
+2. **Find DNS settings**
+   - Look for "DNS Management", "DNS Settings", or "Nameservers"
+3. **Add A Record**
+   - Host/Name: `media` (or your subdomain)
+   - Type: `A`
+   - Points to / Value: your server IP
+   - TTL: Auto or 3600
+4. **Save changes**
+
+### Verify DNS Configuration
+
+Wait 5-10 minutes after creating records, then test:
+
+```bash
+# Test with nslookup
+nslookup media.myservice.net
+
+# Should show:
+# Server: ...
+# Address: ...
+# 
+# Non-authoritative answer:
+# Name: media.myservice.net
+# Address: YOUR_SERVER_IP
+
+# Test with dig (more detailed)
+dig media.myservice.net
+
+# Test with ping
+ping media.myservice.net
+
+# Should ping your server IP
+```
+
+### Troubleshooting DNS
+
+**Problem: nslookup returns NXDOMAIN**
+- DNS record doesn't exist yet
+- Wait longer (up to 24 hours)
+- Check you created the record correctly
+- Verify domain nameservers are set correctly
+
+**Problem: Returns wrong IP**
+- Old DNS record cached
+- Try from different computer/network
+- Use DNS checker: [whatsmydns.net](https://whatsmydns.net)
+- Wait for TTL to expire
+
+**Problem: Works on one device but not another**
+- DNS caching issue
+- Flush DNS cache:
+  ```bash
+  # Mac
+  sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder
+  
+  # Linux
+  sudo systemd-resolve --flush-caches
+  
+  # Windows
+  ipconfig /flushdns
+  ```
+
+### Important Notes
 
 This is how you attach a **custom URL** (hostname) to your LiveKit deployment.
 
