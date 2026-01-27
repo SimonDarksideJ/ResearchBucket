@@ -15,21 +15,54 @@ This approach is generally simpler than a native/systemd install because:
 
 ## Table of Contents
 
-1. [What You’ll Build](#what-youll-build)
-2. [Prerequisites](#prerequisites)
-3. [Step 1: Provision the Hetzner Server](#step-1-provision-the-hetzner-server)
-4. [Step 2: Get the Public IP Address](#step-2-get-the-public-ip-address)
-5. [Step 3: Point DNS to the Server](#step-3-point-dns-to-the-server)
-6. [Step 4: Install Docker](#step-4-install-docker)
-7. [Step 5: Open Firewall Ports](#step-5-open-firewall-ports)
-8. [Step 6: Create LiveKit Config + API Keys](#step-6-create-livekit-config--api-keys)
-9. [Step 7: Create Docker Compose Stack (LiveKit + Caddy)](#step-7-create-docker-compose-stack-livekit--caddy)
-10. [Step 8: Configure SSL/WSS (Automatic)](#step-8-configure-sslwss-automatic)
-11. [Step 9: Validate Connectivity](#step-9-validate-connectivity)
-12. [Logs and Troubleshooting](#logs-and-troubleshooting)
-13. [Appendix A: Native systemd (No Docker)](#appendix-a-native-systemd-no-docker)
+1. [Quick Start: Already Have Domain & DNS?](#quick-start-already-have-domain--dns)
+2. [What You’ll Build](#what-youll-build)
+3. [Prerequisites](#prerequisites)
+4. [Step 1: Provision the Hetzner Server](#step-1-provision-the-hetzner-server)
+5. [Step 2: Get the Public IP Address](#step-2-get-the-public-ip-address)
+6. [Step 3: Point DNS to the Server](#step-3-point-dns-to-the-server)
+7. [Step 4: Install Docker](#step-4-install-docker)
+8. [Step 5: Open Firewall Ports](#step-5-open-firewall-ports)
+9. [Step 6: Create LiveKit Config + API Keys](#step-6-create-livekit-config--api-keys)
+10. [Step 7: Create Docker Compose Stack (LiveKit + Caddy)](#step-7-create-docker-compose-stack-livekit--caddy)
+11. [Step 8: Configure SSL/WSS (Automatic)](#step-8-configure-sslwss-automatic)
+12. [Step 9: Validate Connectivity](#step-9-validate-connectivity)
+13. [Logs and Troubleshooting](#logs-and-troubleshooting)
+14. [Appendix A: Native systemd (No Docker)](#appendix-a-native-systemd-no-docker)
 
 ---
+
+## Quick Start: Already Have Domain & DNS?
+
+> **🚀 SKIP AHEAD IF YOU ALREADY HAVE:**
+> - ✅ A domain name configured
+> - ✅ DNS provider set up and ready
+> - ✅ Just need to know what DNS records to create
+> 
+> **You only need to do this:**
+> 
+> 1. [Provision Hetzner Server](#step-1-provision-the-hetzner-server) → Get your server IP
+> 2. **Create DNS A Record**: Point `media.yourdomain.com` to your Hetzner IP
+> 3. [Install Docker](#step-4-install-docker) → Quick install script
+> 4. [Open Firewall](#step-5-open-firewall-ports) → Allow ports 80, 443, 50000-60000
+> 5. [Deploy LiveKit](#step-7-create-docker-compose-stack-livekit--caddy) → Run Docker Compose
+> 
+> **DNS Configuration (Quick Reference):**
+> ```
+> Type: A
+> Name: media (or your subdomain)
+> Value: YOUR_HETZNER_IP
+> TTL: 300 (5 minutes) or Auto
+> ```
+> 
+> Once DNS propagates (5-30 minutes), Caddy will automatically obtain SSL certificates from Let's Encrypt.
+> 
+> **Total Setup Time: ~15 minutes** (most of it is waiting for DNS propagation)
+> 
+> Continue reading for detailed step-by-step instructions if needed.
+
+---
+
 
 ## What You’ll Build
 

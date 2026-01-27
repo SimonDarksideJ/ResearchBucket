@@ -514,20 +514,47 @@ curl 'http://localhost:9090/api/v1/query?query=livekit_room_total'
 
 The setup script offers multiple reverse proxy options. Here's detailed information for each, including costs and setup instructions.
 
+> **🎯 RECOMMENDATION FOR MAC DEVELOPMENT:**
+> 
+> **Use Tailscale** - It's the perfect choice for development on your Mac:
+> - ✅ **100% FREE** for personal use (up to 100 devices, 3 users)
+> - ✅ Most secure (private network, not exposed to internet)
+> - ✅ No router configuration needed
+> - ✅ Access from any device (Mac, iPhone, iPad, etc.)
+> - ✅ Zero cost for development
+> 
+> See [Option 3: Tailscale](#option-3-tailscale-best-for-privatedevelopment-use) below for setup.
+
 ### Cost Overview
 
-| Service | Free Tier | Paid Plans | Best For |
-|---------|-----------|------------|----------|
-| **ngrok** | ✅ Yes (limited) | From $8/month | Quick setup, testing |
-| **Cloudflare Tunnel** | ✅ Yes (unlimited) | N/A (free forever) | Production, custom domains |
-| **Tailscale** | ✅ Yes (up to 100 devices) | From $6/user/month | Private access, development |
-| **LocalTunnel** | ✅ Yes (completely free) | N/A | Quick testing only |
+| Service | Free Tier | Best Use Case | Paid Plans |
+|---------|-----------|---------------|------------|
+| **Tailscale** 🏆 | ✅ **FREE forever** (100 devices) | **Development** (Mac/personal) | From $6/user/month (teams only) |
+| **Cloudflare Tunnel** 🏆 | ✅ **FREE forever** (unlimited) | **Production** (public access) | N/A (stays free) |
+| **ngrok** | ✅ **FREE** (1 endpoint, 40 conn/min) | Quick testing | From $8/month (custom domains) |
+| **LocalTunnel** | ✅ **FREE** (completely) | Quick tests only | N/A |
 
-💰 **Cost-Saving Recommendation**: Use **Cloudflare Tunnel** (100% free) for production or **Tailscale** (free for personal use) for development.
+💰 **Cost-Saving Recommendations**: 
+- **For Mac Development**: Use **Tailscale** (100% free, most secure)
+- **For Production**: Use **Cloudflare Tunnel** (100% free, only pay for domain ~$10/year)
+- **For Quick Tests**: Use **ngrok free tier** or **LocalTunnel** (both free)
+
+> **💡 About ngrok's Free Tier:**
+> 
+> ngrok **IS FREE** to use! You can run 1 endpoint with up to 40 connections/minute at no cost.
+> You only need to pay ($8-20/month) if you want:
+> - Custom/reserved domain names
+> - More than 1 endpoint
+> - Higher rate limits
+> 
+> For development and testing, the free tier is perfectly adequate!
 
 ---
 
-### Option 1: ngrok (Recommended for Quick Setup)
+### Option 1: ngrok (Quick Setup - Free Tier Available!)
+
+> **✅ YES, ngrok IS FREE!** You can use 1 endpoint with 40 connections/minute at no cost.
+> Only pay if you need custom domains or higher limits.
 
 **🔗 Links:**
 - Sign up: [ngrok.com/signup](https://ngrok.com/signup)
@@ -823,7 +850,19 @@ ingress:
 
 Each subdomain is free - no extra cost!
 
-### Option 3: Tailscale (🏆 Best for Private/Development Use)
+### Option 3: Tailscale (🏆 RECOMMENDED for Mac Development)
+
+> **🎯 PERFECT FOR YOUR MAC DEVELOPMENT SETUP!**
+> 
+> Tailscale is the ideal choice when developing on your Mac:
+> - ✅ **100% FREE** for personal use (no hidden costs, no time limits)
+> - ✅ Most secure option (private network, encrypted)
+> - ✅ No router configuration needed
+> - ✅ Access from iPhone, iPad, other Macs
+> - ✅ Works anywhere (coffee shop, home, office)
+> - ✅ Perfect for development and testing
+> 
+> **Total Cost: $0/year** (stays free forever for personal use)
 
 **🔗 Links:**
 - Sign up: [tailscale.com/start](https://tailscale.com/start)
