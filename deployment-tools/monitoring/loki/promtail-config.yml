@@ -1,0 +1,60 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+  log_level: info
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+    batchwait: 1s
+    batchsize: 1048576
+    timeout: 10s
+
+scrape_configs:
+  # LiveKit application logs
+  - job_name: livekit-logs
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: livekit-logs
+          app: livekit
+          __path__: /var/log/livekit/*.log
+    
+    pipeline_stages:
+      # Parse timestamp and log level
+      - regex:
+          expression: '^(?P<timestamp>\S+)\s+(?P<level>\S+)\s+(?P<message>.*)$'
+      
+      # Extract level as label
+      - labels:
+          level:
+      
+      # Parse timestamp
+      - timestamp:
+          source: timestamp
+          format: RFC3339
+
+  # Docker container logs
+  - job_name: docker-logs
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: docker-logs
+          __path__: /var/lib/docker/containers/*/*.log
+    
+    pipeline_stages:
+      # Parse Docker JSON log format
+      - json:
+          expressions:
+            stream: stream
+            log: log
+            time: time
+      
+      # Use Docker timestamp
+      - timestamp:
+          source: time
+          format: RFC3339Nano

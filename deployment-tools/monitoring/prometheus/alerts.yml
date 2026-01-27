@@ -1,0 +1,36 @@
+groups:
+  - name: livekit_alerts
+    interval: 30s
+    rules:
+      # Service availability
+      - alert: LiveKitDown
+        expr: up{job="livekit"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: livekit
+        annotations:
+          summary: "LiveKit service is down"
+          description: "LiveKit server on {{ $labels.instance }} has been down for more than 1 minute"
+      
+      # High CPU usage
+      - alert: LiveKitHighCPU
+        expr: rate(process_cpu_seconds_total{job="livekit"}[5m]) > 0.8
+        for: 5m
+        labels:
+          severity: warning
+          component: livekit
+        annotations:
+          summary: "LiveKit high CPU usage"
+          description: "LiveKit CPU usage is above 80% for 5 minutes (current: {{ $value | humanizePercentage }})"
+      
+      # High memory usage
+      - alert: LiveKitHighMemory
+        expr: process_resident_memory_bytes{job="livekit"} / 1024 / 1024 / 1024 > 6
+        for: 5m
+        labels:
+          severity: warning
+          component: livekit
+        annotations:
+          summary: "LiveKit high memory usage"
+          description: "LiveKit memory usage is above 6GB (current: {{ $value | humanize }}GB)"
