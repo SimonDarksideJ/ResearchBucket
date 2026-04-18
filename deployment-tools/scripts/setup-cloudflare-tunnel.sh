@@ -1,44 +1,61 @@
 #!/usr/bin/env bash
 
 ################################################################################
-# Cloudflare Tunnel Setup Script
+# Cloudflare Tunnel Helper
 #
-# Configures Cloudflare Tunnel for public access to LiveKit without
-# opening ports on your router
+# Creates a Cloudflare Tunnel for admin or signaling endpoints. This helper is
+# intentionally conservative: Cloudflare Tunnel is useful for dashboards and
+# limited signaling access, but it does not replace LiveKit's required UDP media
+# path.
 #
 # Usage: ./setup-cloudflare-tunnel.sh [OPTIONS]
 #
 # Options:
-#   --domain DOMAIN    Use custom domain (requires Cloudflare DNS)
-#   --help             Show help
+#   --service [grafana|livekit]   Which local service to expose (default: grafana)
+#   --hostname HOSTNAME           Create a named tunnel for this hostname
+#   --name NAME                   Tunnel name (default: livekit-<hostname>)
+#   --help                        Show help
 #
 ################################################################################
 
-set -e
+set -euo pipefail
 
-# Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
-log_info() { echo -e "${BLUE}ℹ${NC} $1"; }
-log_success() { echo -e "${GREEN}✓${NC} $1"; }
-log_warning() { echo -e "${YELLOW}⚠${NC} $1"; }
-log_error() { echo -e "${RED}✗${NC} $1"; }
+SERVICE="grafana"
+HOSTNAME=""
+TUNNEL_NAME=""
+TUNNEL_ID=""
 
-CUSTOM_DOMAIN=""
+log_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
+log_success() { echo -e "${GREEN}[OK]${NC} $1"; }
+log_warning() { echo -e "${YELLOW}[WARN]${NC} $1"; }
+log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
-# Parse arguments
+show_help() {
+    grep '^#' "$0" | sed 's/^# //' | sed 's/^#//'
+}
+
 while [[ $# -gt 0 ]]; do
-    case $1 in
-        --domain)
-            CUSTOM_DOMAIN="$2"
+    case "$1" in
+        --service)
+            SERVICE="$2"
+            shift 2
+            ;;
+        --hostname)
+            HOSTNAME="$2"
+            shift 2
+            ;;
+        --name)
+            TUNNEL_NAME="$2"
             shift 2
             ;;
         --help)
-            grep '^#' "$0" | sed 's/^# //' | sed 's/^#//'
+            show_help
             exit 0
             ;;
         *)
@@ -48,155 +65,70 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# Check if cloudflared is installed
-if ! command -v cloudflared &> /dev/null; then
+if ! command -v cloudflared >/dev/null 2>&1; then
     log_error "cloudflared is not installed"
-    log_info "Install with: brew install cloudflared"
     exit 1
 fi
 
-# Find LiveKit installation
-if [[ -L "$HOME/livekit" ]]; then
-    LIVEKIT_DIR="$HOME/livekit"
-elif [[ -d "/opt/livekit" ]]; then
-    LIVEKIT_DIR="/opt/livekit"
-else
-    log_error "LiveKit installation not found"
-    exit 1
+case "$SERVICE" in
+    grafana)
+        TARGET_URL="http://localhost:3000"
+        ;;
+    livekit)
+        TARGET_URL="http://localhost:7880"
+        log_warning "Cloudflare Tunnel can expose LiveKit signaling, but not the UDP media path or TURN/UDP ports clients still need."
+        ;;
+    *)
+        log_error "Unsupported service: $SERVICE"
+        exit 1
+        ;;
+esac
+
+if [[ -z "$TUNNEL_NAME" ]]; then
+    TUNNEL_NAME="livekit-$(hostname | tr '[:upper:]' '[:lower:]' | tr '.' '-')-$SERVICE"
 fi
 
-cd "$LIVEKIT_DIR"
-
-echo ""
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "  Cloudflare Tunnel Setup"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo ""
-
-log_info "This will set up secure public access to your LiveKit server"
-log_info "No router configuration needed!"
-echo ""
-
-# Authenticate with Cloudflare
-log_info "Step 1: Authenticate with Cloudflare"
-log_info "A browser window will open for authentication..."
-sleep 2
-
-cloudflared tunnel login
-
-if [[ $? -ne 0 ]]; then
-    log_error "Authentication failed"
-    exit 1
+if [[ -z "$HOSTNAME" ]]; then
+    log_info "Starting a quick tunnel to $TARGET_URL"
+    log_warning "Quick tunnels are transient and best suited to short-lived admin access."
+    cloudflared tunnel --url "$TARGET_URL"
+    exit 0
 fi
-
-log_success "Authenticated with Cloudflare"
-echo ""
-
-# Create tunnel
-log_info "Step 2: Creating Cloudflare Tunnel..."
-
-TUNNEL_NAME="livekit-$(hostname | tr '[:upper:]' '[:lower:]' | tr '.' '-')"
-cloudflared tunnel create "$TUNNEL_NAME"
-
-if [[ $? -ne 0 ]]; then
-    log_warning "Tunnel may already exist, trying to use existing tunnel..."
-fi
-
-log_success "Tunnel created: $TUNNEL_NAME"
-echo ""
-
-# Create tunnel configuration
-log_info "Step 3: Configuring tunnel routes..."
 
 mkdir -p "$HOME/.cloudflared"
 
-if [[ -n "$CUSTOM_DOMAIN" ]]; then
-    # Custom domain configuration
-    cat > "$HOME/.cloudflared/config.yml" <<EOF
-tunnel: $TUNNEL_NAME
-credentials-file: $HOME/.cloudflared/${TUNNEL_NAME}.json
+resolve_tunnel_id() {
+    cloudflared tunnel list 2>/dev/null | awk -v name="$TUNNEL_NAME" '$2 == name {print $1; exit}'
+}
+
+log_info "Authenticating with Cloudflare"
+cloudflared tunnel login
+
+TUNNEL_ID="$(resolve_tunnel_id || true)"
+
+if [[ -z "$TUNNEL_ID" ]]; then
+    log_info "Creating tunnel $TUNNEL_NAME"
+    CREATE_OUTPUT="$(cloudflared tunnel create "$TUNNEL_NAME")"
+    TUNNEL_ID="$(echo "$CREATE_OUTPUT" | sed -nE 's/.* id ([0-9a-fA-F-]+).*/\1/p' | tail -1)"
+fi
+
+if [[ -z "$TUNNEL_ID" ]]; then
+    log_error "Could not determine the Cloudflare tunnel ID for $TUNNEL_NAME"
+    exit 1
+fi
+
+log_info "Routing hostname $HOSTNAME to tunnel $TUNNEL_NAME"
+cloudflared tunnel route dns "$TUNNEL_NAME" "$HOSTNAME"
+
+cat > "$HOME/.cloudflared/config.yml" <<EOF
+tunnel: $TUNNEL_ID
+credentials-file: $HOME/.cloudflared/${TUNNEL_ID}.json
 
 ingress:
-  - hostname: $CUSTOM_DOMAIN
-    service: http://localhost:7880
-  - hostname: grafana.$CUSTOM_DOMAIN
-    service: http://localhost:3000
+  - hostname: $HOSTNAME
+    service: $TARGET_URL
   - service: http_status:404
 EOF
-    
-    log_info "Configuring DNS for custom domain..."
-    log_info "Please add the following DNS records in Cloudflare:"
-    echo ""
-    echo "  $CUSTOM_DOMAIN          CNAME   $TUNNEL_NAME.cfargotunnel.com"
-    echo "  grafana.$CUSTOM_DOMAIN  CNAME   $TUNNEL_NAME.cfargotunnel.com"
-    echo ""
-    read -p "Press Enter after adding DNS records..."
-    
-else
-    # Quick tunnel (random subdomain)
-    log_info "Using quick tunnel (random subdomain)..."
-    log_warning "This URL will change if tunnel restarts"
-    log_info "For permanent URL, use --domain flag with your domain"
-    echo ""
-fi
 
-# Add cloudflared to docker-compose
-log_info "Step 4: Adding tunnel to Docker Compose..."
-
-if grep -q "cloudflared" docker-compose.yml; then
-    log_warning "Cloudflared already in docker-compose.yml"
-else
-    cat >> docker-compose.yml <<EOF
-
-  cloudflared:
-    image: cloudflare/cloudflared:latest
-    container_name: cloudflared
-    restart: unless-stopped
-    command: tunnel --no-autoupdate run --token \${CLOUDFLARE_TUNNEL_TOKEN}
-    environment:
-      - CLOUDFLARE_TUNNEL_TOKEN=\${CLOUDFLARE_TUNNEL_TOKEN}
-    networks:
-      - livekit-net
-EOF
-    
-    log_success "Added cloudflared service to docker-compose.yml"
-fi
-
-# Start tunnel
-log_info "Step 5: Starting tunnel..."
-
-if [[ -n "$CUSTOM_DOMAIN" ]]; then
-    # Start tunnel as service
-    docker compose up -d cloudflared
-    
-    log_success "Tunnel started!"
-    echo ""
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "✅ Cloudflare Tunnel Configured!"
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo ""
-    echo "🌐 Public URLs:"
-    echo "   LiveKit:  https://$CUSTOM_DOMAIN"
-    echo "   Grafana:  https://grafana.$CUSTOM_DOMAIN"
-    echo ""
-    echo "🔒 All traffic is encrypted via Cloudflare"
-    echo "📊 View tunnel status: cloudflared tunnel info $TUNNEL_NAME"
-    echo ""
-else
-    # Quick tunnel
-    log_info "Starting quick tunnel (this will generate URLs)..."
-    log_warning "Keep this terminal open or the tunnel will close"
-    echo ""
-    
-    cloudflared tunnel --url http://localhost:7880 &
-    TUNNEL_PID=$!
-    
-    sleep 5
-    
-    log_success "Tunnel running!"
-    log_info "Check terminal output above for your public URL"
-    echo ""
-    echo "To stop tunnel: kill $TUNNEL_PID"
-fi
-
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+log_success "Tunnel configuration written to $HOME/.cloudflared/config.yml"
+log_info "Run 'cloudflared tunnel run $TUNNEL_NAME' to start the tunnel"

@@ -1,36 +1,78 @@
 groups:
-  - name: livekit_alerts
+  - name: livekit_services
     interval: 30s
     rules:
-      # Service availability
       - alert: LiveKitDown
         expr: up{job="livekit"} == 0
         for: 1m
         labels:
           severity: critical
-          component: livekit
         annotations:
-          summary: "LiveKit service is down"
-          description: "LiveKit server on {{ $labels.instance }} has been down for more than 1 minute"
-      
-      # High CPU usage
-      - alert: LiveKitHighCPU
-        expr: rate(process_cpu_seconds_total{job="livekit"}[5m]) > 0.8
-        for: 5m
-        labels:
-          severity: warning
-          component: livekit
-        annotations:
-          summary: "LiveKit high CPU usage"
-          description: "LiveKit CPU usage is above 80% for 5 minutes (current: {{ $value | humanizePercentage }})"
-      
-      # High memory usage
+          summary: "LiveKit is down"
+          description: "LiveKit metrics have been unreachable for more than 1 minute."
+
       - alert: LiveKitHighMemory
-        expr: process_resident_memory_bytes{job="livekit"} / 1024 / 1024 / 1024 > 6
+        expr: process_resident_memory_bytes{job="livekit"} > 6442450944
         for: 5m
         labels:
           severity: warning
-          component: livekit
         annotations:
-          summary: "LiveKit high memory usage"
-          description: "LiveKit memory usage is above 6GB (current: {{ $value | humanize }}GB)"
+          summary: "LiveKit RSS is high"
+          description: "LiveKit has been above 6 GiB resident memory for 5 minutes."
+
+      - alert: LokiDown
+        expr: up{job="loki"} == 0
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Loki is down"
+          description: "Log queries and retention are unavailable."
+
+      - alert: PromtailDown
+        expr: up{job="promtail"} == 0
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Promtail is down"
+          description: "Container log shipping to Loki has stopped."
+
+  - name: host_health
+    interval: 30s
+    rules:
+      - alert: HostHighCPU
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 85
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Host CPU is high"
+          description: "The Linux host has exceeded 85% CPU for 10 minutes."
+
+      - alert: HostHighMemory
+        expr: ((1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100) > 90
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Host memory pressure is high"
+          description: "The Linux host has exceeded 90% memory usage for 10 minutes."
+
+      - alert: HostLowDiskSpace
+        expr: (node_filesystem_avail_bytes{fstype!~"tmpfs|overlay",mountpoint!~"/run.*|/sys.*|/proc.*"} / node_filesystem_size_bytes{fstype!~"tmpfs|overlay",mountpoint!~"/run.*|/sys.*|/proc.*"}) * 100 < 15
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Host disk space is low"
+          description: "A filesystem on the Linux host has fallen below 15% free space."
+
+      - alert: NodeExporterDown
+        expr: up{job="node"} == 0
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Node exporter is down"
+          description: "Host-level system metrics are unavailable."
