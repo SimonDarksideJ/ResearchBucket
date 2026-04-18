@@ -11,7 +11,7 @@ redis:
   address: 127.0.0.1:6379
 
 keys:
-  replace-me: replace-me-secret
+  your-api-key: your-api-secret
 
 prometheus_port: 6789
 
