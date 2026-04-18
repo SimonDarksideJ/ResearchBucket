@@ -3,5 +3,6 @@
 }
 
 livekit.example.com {
+  # Replace with the Mac's WireGuard/Tailscale tunnel IP and LiveKit HTTP port.
   reverse_proxy 10.10.10.2:7880
 }
