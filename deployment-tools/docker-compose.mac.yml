@@ -1,0 +1,21 @@
+services:
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  livekit:
+    image: ${LIVEKIT_IMAGE:-livekit/livekit-server:v1.11.0}
+    command: ["--config", "/etc/livekit/livekit.yaml"]
+    restart: unless-stopped
+    depends_on:
+      - redis
+    volumes:
+      - ./livekit/livekit.mac.yaml:/etc/livekit/livekit.yaml:ro
+      - ./certs:/etc/livekit/certs:ro
+    ports:
+      - "7880:7880"
+      - "7881:7881"
+      - "5349:5349"

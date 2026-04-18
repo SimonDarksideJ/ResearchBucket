@@ -1,0 +1,32 @@
+services:
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no", "--bind", "127.0.0.1"]
+    restart: unless-stopped
+    network_mode: host
+
+  livekit:
+    image: ${LIVEKIT_IMAGE:-livekit/livekit-server:v1.11.0}
+    command: ["--config", "/etc/livekit/livekit.yaml"]
+    restart: unless-stopped
+    depends_on:
+      - redis
+    network_mode: host
+    volumes:
+      - ./livekit/livekit.hetzner.yaml:/etc/livekit/livekit.yaml:ro
+      - ./certs:/etc/livekit/certs:ro
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - livekit
+    network_mode: host
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  caddy_data:
+  caddy_config:

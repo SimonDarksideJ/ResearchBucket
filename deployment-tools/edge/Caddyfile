@@ -1,0 +1,7 @@
+{
+  email ops@example.com
+}
+
+livekit.example.com {
+  reverse_proxy 10.10.10.2:7880
+}
