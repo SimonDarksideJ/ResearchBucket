@@ -1,4 +1,5 @@
 # Linux Hosting Research for LiveKit Media Server
+
 ## Executive Summary & Recommendations
 
 ### Executive Summary
@@ -6,6 +7,7 @@
 After comprehensive research of Linux hosting providers with a focus on EU deployment for LiveKit media servers, several key findings emerge:
 
 **Top Tier Providers:**
+
 1. **Hetzner Cloud** - Best value for EU deployment, excellent performance-to-cost ratio
 2. **Linode (Akamai Connected Cloud)** - Superior container orchestration with excellent global network
 3. **DigitalOcean** - Best developer experience, strong community, good EU presence
@@ -13,6 +15,7 @@ After comprehensive research of Linux hosting providers with a focus on EU deplo
 5. **OVHcloud** - European champion, extensive EU infrastructure, competitive pricing
 
 **Key Considerations for LiveKit:**
+
 - **Bandwidth Requirements**: LiveKit media servers are bandwidth-intensive (100GB-5TB+ monthly depending on usage)
 - **Network Quality**: Low latency and consistent throughput are critical for real-time media
 - **Container Support**: Kubernetes/Docker support enables better scalability
@@ -21,7 +24,9 @@ After comprehensive research of Linux hosting providers with a focus on EU deplo
 ### Scenario-Based Recommendations
 
 #### **Scenario 1: Startup/MVP - Budget-Conscious (<$50/month)**
+
 **Recommended: Hetzner Cloud CX21**
+
 - **Why**: Unbeatable price-to-performance ratio (€5.39/$5.99 per month)
 - 2 vCPU, 4GB RAM, 40GB SSD, 20TB bandwidth
 - Frankfurt/Nuremberg datacenter (EU)
@@ -29,7 +34,9 @@ After comprehensive research of Linux hosting providers with a focus on EU deplo
 - **Alternative**: Vultr Regular Performance ($6/month)
 
 #### **Scenario 2: Production - Small to Medium Scale ($50-200/month)**
+
 **Recommended: Linode Dedicated 4GB + Container Support**
+
 - **Why**: Excellent balance of performance, features, and scalability
 - 4GB RAM, 2 Dedicated CPU cores, 80GB storage, 4TB bandwidth
 - Linode Kubernetes Engine (LKE) for orchestration
@@ -38,14 +45,18 @@ After comprehensive research of Linux hosting providers with a focus on EU deplo
 - **Alternative**: DigitalOcean Premium Intel Droplet + Managed Kubernetes
 
 #### **Scenario 3: Production - High Scale (>$200/month)**
+
 **Recommended: Linode High Memory + LKE or Hetzner Dedicated**
+
 - **Why**: Cost-effective scaling with enterprise features
 - For containers: Linode LKE with mixed node pools
 - For bare metal: Hetzner dedicated servers (AX41: €39/month)
 - **Alternative**: OVHcloud Bare Metal + Kubernetes
 
 #### **Scenario 4: Enterprise/Multi-Region**
+
 **Recommended: Multi-cloud approach with Linode + Hetzner**
+
 - **Why**: Leverage Linode's global network with Hetzner's EU pricing
 - Primary: Linode (global reach, 11 EU locations)
 - EU optimization: Hetzner (cost efficiency)
@@ -53,7 +64,9 @@ After comprehensive research of Linux hosting providers with a focus on EU deplo
 - **Alternative**: AWS Lightsail + EC2 (higher cost, maximum features)
 
 #### **Scenario 5: Maximum EU Privacy/Compliance (GDPR)**
+
 **Recommended: Hetzner or OVHcloud**
+
 - **Why**: European-owned, EU datacenters, strong privacy focus
 - Hetzner: German precision, excellent documentation
 - OVHcloud: French company, 32+ EU datacenters
@@ -67,12 +80,14 @@ After comprehensive research of Linux hosting providers with a focus on EU deplo
 
 **Headquarters**: Germany  
 **EU Datacenters**: Falkenstein, Nuremberg, Helsinki (Finland)  
-**Website**: https://www.hetzner.com/cloud
+**Website**: <https://www.hetzner.com/cloud>
 
 #### Overview
+
 Hetzner is a German hosting company with an outstanding reputation in the EU market. Known for exceptional price-to-performance ratios and reliable infrastructure.
 
 #### Performance & Infrastructure
+
 - **Network**: 100% owned network infrastructure
 - **Bandwidth**: 20TB included on most plans (unmetered at 1Gbit/s)
 - **Storage**: NVMe SSDs on all Cloud servers
@@ -80,7 +95,8 @@ Hetzner is a German hosting company with an outstanding reputation in the EU mar
 - **Network Quality**: Excellent low-latency within EU, good global connectivity
 
 #### Key Features for LiveKit
-- **Container Support**: 
+
+- **Container Support**:
   - Native Docker support
   - Terraform/Ansible integration
   - API for orchestration
@@ -97,6 +113,7 @@ Hetzner is a German hosting company with an outstanding reputation in the EU mar
   - Support for Prometheus/Grafana
 
 #### Pricing (EU Locations)
+
 | Instance Type | vCPU | RAM | Storage | Bandwidth | Price/Month |
 |--------------|------|-----|---------|-----------|-------------|
 | CX11 | 1 | 2GB | 20GB | 20TB | €4.15 ($4.59) |
@@ -107,12 +124,14 @@ Hetzner is a German hosting company with an outstanding reputation in the EU mar
 | CCX33 (dedicated) | 8 | 32GB | 240GB | 20TB | €99.00 ($109.00) |
 
 **Dedicated Servers (Bare Metal)**:
+
 | Server | CPU | RAM | Storage | Price/Month |
 |--------|-----|-----|---------|-------------|
 | AX41 | AMD Ryzen 5 3600 (6c/12t) | 64GB | 2x512GB NVMe | €39.00 ($43.00) |
 | AX102 | AMD EPYC 7502P (32c/64t) | 128GB | 2x1.92TB NVMe | €149.00 ($164.00) |
 
 #### Deals & Long-Term Benefits
+
 - **Volume Pricing**: Discounts for larger deployments
 - **Hourly Billing**: Only pay for what you use
 - **No Egress Fees**: 20TB bandwidth included (additional at €1.19/TB)
@@ -120,6 +139,7 @@ Hetzner is a German hosting company with an outstanding reputation in the EU mar
 - **Community**: Strong developer community, extensive documentation
 
 #### Pros
+
 ✅ Unbeatable price-to-performance ratio  
 ✅ Excellent EU presence and GDPR compliance  
 ✅ Generous bandwidth allowances (20TB standard)  
@@ -130,6 +150,7 @@ Hetzner is a German hosting company with an outstanding reputation in the EU mar
 ✅ Excellent for LiveKit's bandwidth needs  
 
 #### Cons
+
 ❌ Limited global datacenter presence (primarily EU)  
 ❌ No managed Kubernetes service (manual setup required)  
 ❌ No managed LetsEncrypt (manual certbot setup)  
@@ -137,6 +158,7 @@ Hetzner is a German hosting company with an outstanding reputation in the EU mar
 ❌ Fewer managed services than hyperscalers  
 
 #### Community Reputation
+
 - Consistently ranked #1 in EU hosting forums
 - Highly recommended on Reddit r/selfhosted
 - Strong presence in HackerNews discussions
@@ -148,12 +170,14 @@ Hetzner is a German hosting company with an outstanding reputation in the EU mar
 
 **Headquarters**: USA (Akamai subsidiary)  
 **EU Datacenters**: London, Frankfurt, Amsterdam, Stockholm, Madrid, Paris, Milan (11 EU locations)  
-**Website**: https://www.linode.com
+**Website**: <https://www.linode.com>
 
 #### Overview
+
 Linode, now part of Akamai, offers excellent developer experience with strong container orchestration. Perfect for scaling LiveKit deployments globally.
 
 #### Performance & Infrastructure
+
 - **Network**: Akamai's global CDN/network (40Tbps capacity)
 - **Bandwidth**: 1-12TB included depending on plan
 - **Storage**: NVMe SSDs
@@ -161,6 +185,7 @@ Linode, now part of Akamai, offers excellent developer experience with strong co
 - **Network Quality**: Exceptional global connectivity via Akamai backbone
 
 #### Key Features for LiveKit
+
 - **Container Support**: ⭐ Outstanding
   - Linode Kubernetes Engine (LKE) - fully managed
   - Docker pre-installed on images
@@ -180,6 +205,7 @@ Linode, now part of Akamai, offers excellent developer experience with strong co
   - Alert notifications
 
 #### Pricing (EU Locations)
+
 | Instance Type | vCPU | RAM | Storage | Bandwidth | Price/Month |
 |--------------|------|-----|---------|-----------|-------------|
 | Nanode 1GB | 1 shared | 1GB | 25GB | 1TB | $5 |
@@ -190,11 +216,13 @@ Linode, now part of Akamai, offers excellent developer experience with strong co
 | Dedicated 16GB | 8 dedicated | 16GB | 320GB | 8TB | $144 |
 
 **Kubernetes Pricing**:
+
 - LKE Control Plane: **Free**
 - Worker Nodes: Standard Linode pricing
 - Load Balancer: $10/month per LB
 
 #### Deals & Long-Term Benefits
+
 - **$100 Free Credit**: New accounts (60-day validity)
 - **Annual Discounts**: Prepay for savings
 - **Referral Program**: $100 credit for referrals
@@ -202,6 +230,7 @@ Linode, now part of Akamai, offers excellent developer experience with strong co
 - **Free Backups**: Available as add-on ($2-$5/month)
 
 #### Pros
+
 ✅ Best-in-class Kubernetes support (LKE)  
 ✅ Excellent global network (Akamai backbone)  
 ✅ Strong EU presence (11 datacenters)  
@@ -212,12 +241,14 @@ Linode, now part of Akamai, offers excellent developer experience with strong co
 ✅ Strong community and tutorials  
 
 #### Cons
+
 ❌ More expensive than Hetzner for basic VMs  
 ❌ US-based company (GDPR considerations)  
 ❌ Bandwidth overages more expensive than Hetzner  
 ❌ Fewer "special offers" than competitors  
 
 #### Community Reputation
+
 - Highly regarded for reliability and support
 - Popular choice for Kubernetes deployments
 - 4.3/5 on Trustpilot
@@ -229,12 +260,14 @@ Linode, now part of Akamai, offers excellent developer experience with strong co
 
 **Headquarters**: USA  
 **EU Datacenters**: Amsterdam, Frankfurt, London  
-**Website**: https://www.digitalocean.com
+**Website**: <https://www.digitalocean.com>
 
 #### Overview
+
 DigitalOcean focuses on simplicity and developer experience. Excellent documentation and community, ideal for teams wanting quick deployment.
 
 #### Performance & Infrastructure
+
 - **Network**: Multi-cloud network with premium carriers
 - **Bandwidth**: 1-12TB included
 - **Storage**: SSD/NVMe depending on tier
@@ -242,6 +275,7 @@ DigitalOcean focuses on simplicity and developer experience. Excellent documenta
 - **Network Quality**: Good, premium tier has better peering
 
 #### Key Features for LiveKit
+
 - **Container Support**: Excellent
   - DigitalOcean Kubernetes (DOKS) - fully managed
   - Container Registry included
@@ -260,6 +294,7 @@ DigitalOcean focuses on simplicity and developer experience. Excellent documenta
   - Log forwarding
 
 #### Pricing (EU Locations)
+
 | Droplet Type | vCPU | RAM | Storage | Bandwidth | Price/Month |
 |--------------|------|-----|---------|-----------|-------------|
 | Basic | 1 | 1GB | 25GB | 1TB | $6 |
@@ -270,11 +305,13 @@ DigitalOcean focuses on simplicity and developer experience. Excellent documenta
 | Premium Intel | 2 | 8GB | 160GB | 5TB | $63 |
 
 **Kubernetes Pricing**:
+
 - DOKS Control Plane: **Free**
 - Worker Nodes: Droplet pricing
 - Load Balancer: $12/month
 
 #### Deals & Long-Term Benefits
+
 - **$200 Free Credit**: New accounts (60-day validity)
 - **GitHub Student Pack**: $200 credit for students
 - **Startup Program**: Up to $10,000 credits
@@ -282,6 +319,7 @@ DigitalOcean focuses on simplicity and developer experience. Excellent documenta
 - **Educational Resources**: Extensive free tutorials
 
 #### Pros
+
 ✅ Outstanding documentation and tutorials  
 ✅ Intuitive user interface  
 ✅ Strong community (Community Q&A)  
@@ -291,6 +329,7 @@ DigitalOcean focuses on simplicity and developer experience. Excellent documenta
 ✅ Transparent pricing  
 
 #### Cons
+
 ❌ More expensive than Hetzner/Vultr  
 ❌ Limited EU datacenter locations (3)  
 ❌ Premium tier significantly more expensive  
@@ -298,6 +337,7 @@ DigitalOcean focuses on simplicity and developer experience. Excellent documenta
 ❌ Bandwidth overage costs can add up  
 
 #### Community Reputation
+
 - Massive community following
 - Excellent tutorials ecosystem
 - 4.0/5 on Trustpilot
@@ -309,12 +349,14 @@ DigitalOcean focuses on simplicity and developer experience. Excellent documenta
 
 **Headquarters**: USA  
 **EU Datacenters**: Amsterdam, Frankfurt, London, Paris, Madrid, Warsaw, Stockholm  
-**Website**: https://www.vultr.com
+**Website**: <https://www.vultr.com>
 
 #### Overview
+
 Vultr offers diverse instance types including bare metal and high-frequency compute. Strong global presence with competitive pricing.
 
 #### Performance & Infrastructure
+
 - **Network**: Global backbone with 32+ locations
 - **Bandwidth**: 1-3TB on regular, 2-5TB on high-frequency
 - **Storage**: NVMe SSDs on all plans
@@ -322,6 +364,7 @@ Vultr offers diverse instance types including bare metal and high-frequency comp
 - **Network Quality**: Excellent, particularly on bare metal
 
 #### Key Features for LiveKit
+
 - **Container Support**: Good
   - Vultr Kubernetes Engine (VKE) - managed
   - One-click Docker applications
@@ -340,6 +383,7 @@ Vultr offers diverse instance types including bare metal and high-frequency comp
   - API for integration
 
 #### Pricing (EU Locations)
+
 | Instance Type | vCPU | RAM | Storage | Bandwidth | Price/Month |
 |--------------|------|-----|---------|-----------|-------------|
 | Regular | 1 | 1GB | 25GB | 1TB | $6 |
@@ -350,17 +394,20 @@ Vultr offers diverse instance types including bare metal and high-frequency comp
 | High Frequency | 3 | 8GB | 256GB | 4TB | $72 |
 
 **Bare Metal Pricing**:
+
 | Type | CPU | RAM | Storage | Bandwidth | Price/Month |
 |------|-----|-----|---------|-----------|-------------|
 | E-2286G | Intel Xeon E-2286G (6c/12t) | 32GB | 2x480GB SSD | 10TB | $185 |
 | Ryzen 9 5950X | AMD Ryzen 9 (16c/32t) | 128GB | 2x960GB NVMe | 10TB | $350 |
 
 **Kubernetes Pricing**:
+
 - VKE Control Plane: **Free**
 - Worker Nodes: Instance pricing
 - Load Balancer: $10/month
 
 #### Deals & Long-Term Benefits
+
 - **$250-$300 Free Credit**: Promotional offers
 - **Referral Program**: $30 credit
 - **Pay-as-you-go**: Hourly billing
@@ -368,6 +415,7 @@ Vultr offers diverse instance types including bare metal and high-frequency comp
 - **Bare Metal Deals**: Monthly/annual savings
 
 #### Pros
+
 ✅ Strong bare metal options for high performance  
 ✅ High-frequency compute for low latency  
 ✅ Good EU datacenter coverage (7 locations)  
@@ -377,6 +425,7 @@ Vultr offers diverse instance types including bare metal and high-frequency comp
 ✅ Hourly billing flexibility  
 
 #### Cons
+
 ❌ US-based company  
 ❌ Support quality varies (community reports)  
 ❌ No standout unique features  
@@ -384,6 +433,7 @@ Vultr offers diverse instance types including bare metal and high-frequency comp
 ❌ Managed Kubernetes newer/less mature  
 
 #### Community Reputation
+
 - Generally positive reviews for performance
 - 4.2/5 on Trustpilot
 - Popular for game servers and high-performance needs
@@ -395,12 +445,14 @@ Vultr offers diverse instance types including bare metal and high-frequency comp
 
 **Headquarters**: France  
 **EU Datacenters**: 32+ locations across Europe (UK, France, Germany, Poland, Italy, Spain, etc.)  
-**Website**: https://www.ovhcloud.com
+**Website**: <https://www.ovhcloud.com>
 
 #### Overview
+
 European hosting giant with the most extensive EU infrastructure. Excellent for GDPR compliance and data sovereignty requirements.
 
 #### Performance & Infrastructure
+
 - **Network**: Largest European network (20Tbps capacity)
 - **Bandwidth**: Unmetered on most plans (1Gbps-10Gbps)
 - **Storage**: SSD/NVMe
@@ -408,6 +460,7 @@ European hosting giant with the most extensive EU infrastructure. Excellent for 
 - **Network Quality**: Excellent within EU, good globally
 
 #### Key Features for LiveKit
+
 - **Container Support**: Strong
   - OVH Managed Kubernetes Service
   - OpenStack integration
@@ -426,6 +479,7 @@ European hosting giant with the most extensive EU infrastructure. Excellent for 
   - SNMP access
 
 #### Pricing (EU Locations - Public Cloud)
+
 | Instance Type | vCPU | RAM | Storage | Price/Month |
 |--------------|------|-----|---------|-------------|
 | b2-7 | 2 | 7GB | 50GB | £20 (~€23/$25) |
@@ -435,12 +489,14 @@ European hosting giant with the most extensive EU infrastructure. Excellent for 
 | c2-15 (dedicated) | 4 | 15GB | 100GB | £64 (~€74/$80) |
 
 **Dedicated Servers (Rise/Advance Range)**:
+
 | Server | CPU | RAM | Storage | Bandwidth | Price/Month |
 |--------|-----|-----|---------|-----------|-------------|
 | Rise-1 | AMD EPYC 7351P | 32GB | 2x450GB SSD | 1Gbps unmetered | €59.99 |
 | Rise-2 | AMD EPYC 7451 | 128GB | 2x960GB NVMe | 1Gbps unmetered | €109.99 |
 
 #### Deals & Long-Term Benefits
+
 - **12-Month Prepay**: Up to 15% discount
 - **Volume Discounts**: For large deployments
 - **Unmetered Bandwidth**: No overage charges
@@ -448,6 +504,7 @@ European hosting giant with the most extensive EU infrastructure. Excellent for 
 - **Educational Pricing**: Discounts for education
 
 #### Pros
+
 ✅ Best EU datacenter coverage  
 ✅ European company - full GDPR compliance  
 ✅ Unmetered bandwidth on dedicated servers  
@@ -457,6 +514,7 @@ European hosting giant with the most extensive EU infrastructure. Excellent for 
 ✅ Data sovereignty for EU operations  
 
 #### Cons
+
 ❌ Interface can be complex  
 ❌ Support quality inconsistent (community feedback)  
 ❌ Documentation less beginner-friendly  
@@ -464,6 +522,7 @@ European hosting giant with the most extensive EU infrastructure. Excellent for 
 ❌ Some services feel dated  
 
 #### Community Reputation
+
 - Strong reputation in EU market
 - 4.0/5 on Trustpilot
 - Popular for dedicated servers
@@ -475,12 +534,14 @@ European hosting giant with the most extensive EU infrastructure. Excellent for 
 
 **Headquarters**: USA  
 **EU Datacenters**: Ireland, Frankfurt, London, Paris, Stockholm, Milan, Spain, Zurich  
-**Website**: https://aws.amazon.com/lightsail/ | https://aws.amazon.com/ec2/
+**Website**: <https://aws.amazon.com/lightsail/> | <https://aws.amazon.com/ec2/>
 
 #### Overview
+
 The hyperscaler option with maximum features and global reach. Lightsail offers simplified pricing while EC2 provides enterprise-grade infrastructure.
 
 #### Performance & Infrastructure
+
 - **Network**: World-class global backbone
 - **Bandwidth**: 1-7TB on Lightsail, data transfer costs on EC2
 - **Storage**: EBS SSD/NVMe options
@@ -488,6 +549,7 @@ The hyperscaler option with maximum features and global reach. Lightsail offers 
 - **Network Quality**: Excellent globally
 
 #### Key Features for LiveKit
+
 - **Container Support**: Industry-leading
   - Amazon EKS (Elastic Kubernetes Service)
   - Amazon ECS (Elastic Container Service)
@@ -506,6 +568,7 @@ The hyperscaler option with maximum features and global reach. Lightsail offers 
   - X-Ray for tracing
 
 #### Pricing (EU Regions - Lightsail)
+
 | Instance | vCPU | RAM | Storage | Bandwidth | Price/Month |
 |----------|------|-----|---------|-----------|-------------|
 | $5 plan | 1 | 512MB | 20GB | 1TB | $5 |
@@ -515,11 +578,13 @@ The hyperscaler option with maximum features and global reach. Lightsail offers 
 | $80 plan | 2 | 8GB | 160GB | 5TB | $80 |
 
 **EC2 Pricing (t3 instances, Frankfurt)**:
+
 - t3.medium (2 vCPU, 4GB): ~$30/month + data transfer
 - t3.large (2 vCPU, 8GB): ~$60/month + data transfer
 - Data transfer: $0.09/GB egress (expensive for media!)
 
 #### Deals & Long-Term Benefits
+
 - **AWS Free Tier**: 12 months free EC2 t2.micro
 - **Savings Plans**: Up to 72% savings with commitment
 - **Reserved Instances**: 1-3 year commitments save 30-60%
@@ -527,6 +592,7 @@ The hyperscaler option with maximum features and global reach. Lightsail offers 
 - **AWS Activate**: Up to $100,000 credits for startups
 
 #### Pros
+
 ✅ Maximum feature set and ecosystem  
 ✅ Best-in-class reliability  
 ✅ Comprehensive managed services  
@@ -536,6 +602,7 @@ The hyperscaler option with maximum features and global reach. Lightsail offers 
 ✅ Enterprise support available  
 
 #### Cons
+
 ❌ Complex pricing and billing  
 ❌ Egress bandwidth very expensive for media ($0.09/GB)  
 ❌ Steep learning curve  
@@ -544,6 +611,7 @@ The hyperscaler option with maximum features and global reach. Lightsail offers 
 ❌ Can become very expensive quickly  
 
 #### Community Reputation
+
 - Industry standard for enterprise
 - Extensive documentation and community
 - 4.4/5 on G2 for cloud infrastructure
@@ -555,12 +623,14 @@ The hyperscaler option with maximum features and global reach. Lightsail offers 
 
 **Headquarters**: USA  
 **EU Datacenters**: Belgium, Netherlands, Finland, Frankfurt, London, Madrid, Milan, Paris, Warsaw, Zurich  
-**Website**: https://cloud.google.com
+**Website**: <https://cloud.google.com>
 
 #### Overview
+
 Google's cloud platform with excellent network performance and Kubernetes heritage (created Kubernetes).
 
 #### Performance & Infrastructure
+
 - **Network**: Google's global fiber network
 - **Bandwidth**: 1TB egress free, then tiered pricing
 - **Storage**: Persistent SSD/NVMe
@@ -568,6 +638,7 @@ Google's cloud platform with excellent network performance and Kubernetes herita
 - **Network Quality**: Excellent, especially for media
 
 #### Key Features for LiveKit
+
 - **Container Support**: Exceptional (created Kubernetes)
   - Google Kubernetes Engine (GKE) - best-in-class
   - Cloud Run (serverless containers)
@@ -584,6 +655,7 @@ Google's cloud platform with excellent network performance and Kubernetes herita
   - Real-time metrics
 
 #### Pricing (EU Regions)
+
 | Instance Type | vCPU | RAM | Price/Month (estimated) |
 |--------------|------|-----|------------------------|
 | e2-small | 2 | 2GB | ~$15 |
@@ -594,6 +666,7 @@ Google's cloud platform with excellent network performance and Kubernetes herita
 **Note**: Egress bandwidth costs ~$0.08-0.12/GB after 1TB free
 
 #### Deals & Long-Term Benefits
+
 - **$300 Free Credit**: 90-day trial for new accounts
 - **Always Free Tier**: Includes 1 f1-micro instance
 - **Sustained Use Discounts**: Automatic savings (up to 30%)
@@ -601,6 +674,7 @@ Google's cloud platform with excellent network performance and Kubernetes herita
 - **Startup Program**: Up to $100,000 credits
 
 #### Pros
+
 ✅ Best Kubernetes implementation (GKE)  
 ✅ Excellent network performance  
 ✅ Strong AI/ML integration (future-proofing)  
@@ -609,6 +683,7 @@ Google's cloud platform with excellent network performance and Kubernetes herita
 ✅ Strong EU presence (10 regions)  
 
 #### Cons
+
 ❌ Complex pricing model  
 ❌ Egress bandwidth expensive for media  
 ❌ US-based company  
@@ -616,6 +691,7 @@ Google's cloud platform with excellent network performance and Kubernetes herita
 ❌ Can be expensive at scale  
 
 #### Community Reputation
+
 - Highly regarded for Kubernetes
 - 4.5/5 on G2 for container management
 - Strong developer following
@@ -626,12 +702,14 @@ Google's cloud platform with excellent network performance and Kubernetes herita
 
 **Headquarters**: USA  
 **EU Datacenters**: 10+ regions including UK, France, Germany, Switzerland, Sweden, Norway, Italy, Poland  
-**Website**: https://azure.microsoft.com
+**Website**: <https://azure.microsoft.com>
 
 #### Overview
+
 Microsoft's enterprise-focused cloud platform with extensive global infrastructure and strong enterprise integration.
 
 #### Performance & Infrastructure
+
 - **Network**: Global WAN with peering
 - **Bandwidth**: 100GB outbound free/month on VMs
 - **Storage**: Premium SSD/Ultra SSD
@@ -639,6 +717,7 @@ Microsoft's enterprise-focused cloud platform with extensive global infrastructu
 - **Network Quality**: Excellent for enterprise
 
 #### Key Features for LiveKit
+
 - **Container Support**: Comprehensive
   - Azure Kubernetes Service (AKS) - free control plane
   - Azure Container Instances (ACI)
@@ -658,6 +737,7 @@ Microsoft's enterprise-focused cloud platform with extensive global infrastructu
   - Alert rules
 
 #### Pricing (EU Regions)
+
 | VM Size | vCPU | RAM | Price/Month (West Europe) |
 |---------|------|-----|---------------------------|
 | B2s | 2 | 4GB | ~$35 |
@@ -668,6 +748,7 @@ Microsoft's enterprise-focused cloud platform with extensive global infrastructu
 **Note**: Bandwidth costs ~$0.05-0.087/GB after 100GB free
 
 #### Deals & Long-Term Benefits
+
 - **$200 Free Credit**: 30-day trial
 - **Always Free Services**: Limited free tier
 - **Reserved Instances**: Save up to 72% (1-3 year commitment)
@@ -675,6 +756,7 @@ Microsoft's enterprise-focused cloud platform with extensive global infrastructu
 - **Startup Program**: Up to $120,000 credits
 
 #### Pros
+
 ✅ Strong enterprise features  
 ✅ Free AKS control plane  
 ✅ Excellent Windows integration (if needed)  
@@ -683,6 +765,7 @@ Microsoft's enterprise-focused cloud platform with extensive global infrastructu
 ✅ Strong enterprise support  
 
 #### Cons
+
 ❌ Complex pricing structure  
 ❌ Higher base costs than alternatives  
 ❌ Egress bandwidth costs for media  
@@ -691,6 +774,7 @@ Microsoft's enterprise-focused cloud platform with extensive global infrastructu
 ❌ More expensive than specialized hosting  
 
 #### Community Reputation
+
 - Strong in enterprise market
 - 4.3/5 on G2
 - Mixed feedback on cost management
@@ -701,12 +785,14 @@ Microsoft's enterprise-focused cloud platform with extensive global infrastructu
 
 **Headquarters**: Finland  
 **EU Datacenters**: Finland, Germany, Spain, UK, Netherlands, Poland  
-**Website**: https://upcloud.com
+**Website**: <https://upcloud.com>
 
 #### Overview
+
 Finnish cloud provider known for high performance and excellent uptime. Strong European alternative to US-based providers.
 
 #### Performance & Infrastructure
+
 - **Network**: MaxIOPS storage technology
 - **Bandwidth**: 2-8TB included depending on plan
 - **Storage**: MaxIOPS (100k IOPS guaranteed)
@@ -714,6 +800,7 @@ Finnish cloud provider known for high performance and excellent uptime. Strong E
 - **Network Quality**: Excellent in EU
 
 #### Key Features for LiveKit
+
 - **Container Support**: Good
   - Managed Kubernetes available
   - Docker pre-installed images
@@ -730,6 +817,7 @@ Finnish cloud provider known for high performance and excellent uptime. Strong E
   - Alert system
 
 #### Pricing (EU Locations)
+
 | Instance | vCPU | RAM | Storage | Bandwidth | Price/Month |
 |----------|------|-----|---------|-----------|-------------|
 | 1GB | 1 | 1GB | 25GB | 2TB | $5 |
@@ -738,12 +826,14 @@ Finnish cloud provider known for high performance and excellent uptime. Strong E
 | 8GB | 4 | 8GB | 160GB | 4TB | $40 |
 
 #### Deals & Long-Term Benefits
+
 - **$25 Free Credit**: New accounts
 - **Flexible hourly billing**
 - **99.99% SLA with 100% uptime goal**
 - **No data transfer fees within EU locations**
 
 #### Pros
+
 ✅ European company (Finland)  
 ✅ Excellent performance (MaxIOPS)  
 ✅ 100% uptime guarantee  
@@ -752,12 +842,14 @@ Finnish cloud provider known for high performance and excellent uptime. Strong E
 ✅ GDPR compliant  
 
 #### Cons
+
 ❌ Smaller than major providers  
 ❌ Limited global presence  
 ❌ Smaller ecosystem  
 ❌ Less community content  
 
 #### Community Reputation
+
 - Highly regarded for performance
 - 4.6/5 on Trustpilot
 - Strong reputation in EU developer circles
@@ -768,12 +860,14 @@ Finnish cloud provider known for high performance and excellent uptime. Strong E
 
 **Headquarters**: France  
 **EU Datacenters**: Paris, Amsterdam, Warsaw  
-**Website**: https://www.scaleway.com
+**Website**: <https://www.scaleway.com>
 
 #### Overview
+
 French cloud provider with innovative instance types and good pricing. Strong European presence and GDPR focus.
 
 #### Performance & Infrastructure
+
 - **Network**: European backbone
 - **Bandwidth**: Unmetered at 200Mbps-1Gbps
 - **Storage**: SSD/NVMe options
@@ -781,6 +875,7 @@ French cloud provider with innovative instance types and good pricing. Strong Eu
 - **Network Quality**: Good within EU
 
 #### Key Features for LiveKit
+
 - **Container Support**: Excellent
   - Scaleway Kubernetes Kapsule (managed)
   - Serverless Containers
@@ -797,6 +892,7 @@ French cloud provider with innovative instance types and good pricing. Strong Eu
   - Alerting system
 
 #### Pricing (EU Locations)
+
 | Instance Type | vCPU | RAM | Storage | Price/Month |
 |--------------|------|-----|---------|-------------|
 | DEV1-S | 2 | 2GB | 20GB | €7.99 (~$9) |
@@ -804,11 +900,13 @@ French cloud provider with innovative instance types and good pricing. Strong Eu
 | GP1-XS | 4 | 16GB | 150GB | €42.99 (~$47) |
 
 #### Deals & Long-Term Benefits
+
 - **€100 Free Credit**: Promotional offers
 - **Unmetered bandwidth**: No overage fees
 - **Competitive pricing**
 
 #### Pros
+
 ✅ European company (France)  
 ✅ Innovative instance types  
 ✅ Unmetered bandwidth  
@@ -817,12 +915,14 @@ French cloud provider with innovative instance types and good pricing. Strong Eu
 ✅ Competitive pricing  
 
 #### Cons
+
 ❌ Limited datacenter locations (3)  
 ❌ Smaller ecosystem  
 ❌ Less global reach  
 ❌ Fewer third-party integrations  
 
 #### Community Reputation
+
 - Growing positive reputation
 - 4.2/5 on Trustpilot
 - Popular in French developer community
@@ -887,22 +987,26 @@ French cloud provider with innovative instance types and good pricing. Strong Eu
 ## LiveKit-Specific Considerations
 
 ### System Requirements for LiveKit Server
+
 - **Minimum**: 2 vCPU, 4GB RAM (small deployments, <50 concurrent users)
 - **Recommended**: 4-8 vCPU, 8-16GB RAM (100-500 concurrent users)
 - **Enterprise**: 16+ vCPU, 32GB+ RAM, or distributed architecture
 
 ### Network Requirements
+
 - **Bandwidth**: 100-500GB per month minimum, scale with users
 - **Latency**: <100ms to users (within region)
 - **Quality**: Consistent throughput, minimal packet loss
 - **Ports**: UDP 443, 7881, TCP 443, 7880 (WebRTC)
 
 ### Storage Requirements
+
 - **OS & Software**: 20GB minimum
 - **Recordings** (if enabled): Scale based on usage (1GB per hour of HD recording)
 - **Logs**: 5-10GB for monitoring and debugging
 
 ### Key Features for LiveKit Hosting
+
 1. **Low Latency Networking**: Critical for real-time media
 2. **Generous Bandwidth**: Media servers consume significant bandwidth
 3. **Container Support**: Kubernetes enables easy scaling and updates
@@ -914,24 +1018,28 @@ French cloud provider with innovative instance types and good pricing. Strong Eu
 ### Scalability Patterns
 
 #### Pattern 1: Single Instance (Starter)
+
 - **Setup**: One VM with Docker
 - **Best for**: <50 concurrent users, MVP, testing
 - **Recommended**: Hetzner CX31, Vultr Regular, DigitalOcean Basic
 - **Cost**: $12-24/month
 
 #### Pattern 2: Load Balanced (Production)
+
 - **Setup**: Multiple VMs behind load balancer
 - **Best for**: 50-500 concurrent users, production
 - **Recommended**: Linode + LKE, DigitalOcean + DOKS
 - **Cost**: $100-500/month
 
 #### Pattern 3: Kubernetes (Enterprise)
+
 - **Setup**: Managed Kubernetes with auto-scaling
 - **Best for**: >500 concurrent users, multi-region
 - **Recommended**: Linode LKE, GKE, AKS
 - **Cost**: $500-5000+/month
 
 #### Pattern 4: Hybrid (Cost-Optimized)
+
 - **Setup**: EU traffic on Hetzner, global on Linode
 - **Best for**: Cost-conscious with global reach
 - **Recommended**: Hetzner (EU) + Linode (Global)
@@ -942,6 +1050,7 @@ French cloud provider with innovative instance types and good pricing. Strong Eu
 ## Security Considerations
 
 ### Essential Security Features
+
 1. **DDoS Protection**: All recommended providers include this
 2. **Firewall**: Configure to allow only LiveKit ports
 3. **SSL/TLS**: LetsEncrypt certificates (required for WebRTC)
@@ -953,6 +1062,7 @@ French cloud provider with innovative instance types and good pricing. Strong Eu
 ### LetsEncrypt Implementation
 
 #### Manual Setup (Hetzner, Vultr, UpCloud)
+
 ```bash
 # Install certbot
 apt-get install certbot
@@ -965,6 +1075,7 @@ certbot renew --dry-run
 ```
 
 #### Automated Setup (Kubernetes)
+
 ```yaml
 # Using cert-manager
 apiVersion: cert-manager.io/v1
@@ -980,6 +1091,7 @@ spec:
 ```
 
 #### Managed (AWS, Azure, GCP)
+
 - Use cloud-native certificate services
 - Automatic renewal included
 - Integration with load balancers
@@ -987,12 +1099,14 @@ spec:
 ### GDPR Compliance for EU Deployment
 
 **European Providers (Highest Compliance)**:
+
 - Hetzner (Germany)
 - OVHcloud (France)
 - Scaleway (France)
 - UpCloud (Finland)
 
 **US Providers with EU Datacenters**:
+
 - Ensure data residency in EU regions
 - Review Data Processing Agreements (DPA)
 - Consider data transfer implications
@@ -1003,20 +1117,24 @@ spec:
 ## Support Quality Analysis
 
 ### Tier 1 Support (Excellent)
+
 - **Linode**: 24/7 ticket support, comprehensive docs, community
 - **DigitalOcean**: 24/7 ticket, extensive tutorials, Q&A community
 - **AWS/GCP/Azure**: Enterprise support available (paid), extensive docs
 
 ### Tier 2 Support (Good)
+
 - **Hetzner**: Email/ticket support, good docs, strong community
 - **UpCloud**: 24/7 support, good response times
 - **Scaleway**: Ticket support, improving documentation
 
 ### Tier 3 Support (Variable)
+
 - **Vultr**: Ticket support, community reports mixed experiences
 - **OVHcloud**: Ticket support, language barriers reported, complex interface
 
 ### Community Support Resources
+
 - **Reddit**: r/selfhosted, r/webrtc, r/homelab
 - **Discord**: LiveKit official Discord, hosting provider communities
 - **GitHub**: LiveKit discussions and issues
@@ -1027,6 +1145,7 @@ spec:
 ## Implementation Roadmap
 
 ### Phase 1: MVP Deployment (Week 1)
+
 **Goal**: Get LiveKit running for testing
 
 1. **Choose Provider**: Hetzner CX31 or DigitalOcean Basic Droplet
@@ -1041,6 +1160,7 @@ spec:
 **Capacity**: 10-50 concurrent users
 
 ### Phase 2: Production Deployment (Week 2-3)
+
 **Goal**: Production-ready with monitoring
 
 1. **Upgrade Instance**: Based on load testing results
@@ -1055,6 +1175,7 @@ spec:
 **Capacity**: 50-100 concurrent users
 
 ### Phase 3: Scaling (Month 2)
+
 **Goal**: Horizontal scalability with Kubernetes
 
 1. **Choose K8s Platform**: Linode LKE or DigitalOcean DOKS
@@ -1075,6 +1196,7 @@ spec:
 ### Scenario: Growing LiveKit Service
 
 #### Year 1
+
 | Quarter | Users | Bandwidth | Recommended Setup | Monthly Cost |
 |---------|-------|-----------|-------------------|--------------|
 | Q1 | 50 | 500GB | Hetzner CX31 | $12 |
@@ -1085,6 +1207,7 @@ spec:
 **Year 1 Total**: ~$2,200
 
 #### Year 2 (Projected)
+
 | Quarter | Users | Bandwidth | Setup | Monthly Cost |
 |---------|-------|-----------|-------|--------------|
 | Q1 | 2000 | 20TB | LKE Multi-region | $400 |
@@ -1095,6 +1218,7 @@ spec:
 **Year 2 Total**: ~$30,000
 
 ### Cost Optimization Strategies
+
 1. **Start Small**: Hetzner or Vultr for MVP
 2. **Monitor Usage**: Only scale when needed
 3. **Leverage Free Tiers**: $100-300 credits from providers
@@ -1108,35 +1232,45 @@ spec:
 ## Final Recommendations Summary
 
 ### 🥇 Best Overall: Hetzner Cloud (Budget) + Linode (Scale)
+
 **Strategy**: Start with Hetzner for EU, migrate to Linode LKE when scaling
+
 - **Rationale**: Best price-to-performance, smooth migration path
 - **Initial**: Hetzner CX31 ($12/month)
 - **Scale**: Linode LKE ($100-500/month)
 - **Total Year 1**: ~$1,500-2,000
 
 ### 🥈 Best All-in-One: Linode (Akamai Connected Cloud)
+
 **Strategy**: Start and scale entirely on Linode
+
 - **Rationale**: Excellent Kubernetes, global network, no migration needed
 - **Initial**: Linode 4GB ($24/month)
 - **Scale**: LKE with auto-scaling
 - **Total Year 1**: ~$3,000-4,000
 
 ### 🥉 Best Developer Experience: DigitalOcean
+
 **Strategy**: Use DO for entire lifecycle
+
 - **Rationale**: Best documentation, easiest learning curve
 - **Initial**: Basic Droplet ($24/month)
 - **Scale**: DOKS managed Kubernetes
 - **Total Year 1**: ~$3,500-5,000
 
 ### 🏆 Best EU Compliance: Hetzner or OVHcloud
+
 **Strategy**: European providers only
+
 - **Rationale**: Maximum GDPR compliance, data sovereignty
 - **Initial**: Hetzner CX31 or OVH b2-7
 - **Scale**: Hetzner dedicated or OVH Kubernetes
 - **Total Year 1**: ~$1,500-3,000
 
 ### 💼 Enterprise/High-Scale: Multi-cloud (Linode + Hetzner)
+
 **Strategy**: Hybrid approach for cost and performance
+
 - **Rationale**: Optimize for each region, redundancy
 - **Setup**: Hetzner (EU) + Linode (Global)
 - **Cost**: $500-2,000/month at scale
@@ -1181,25 +1315,29 @@ END
 ## Additional Resources
 
 ### Official Documentation
-- **LiveKit**: https://docs.livekit.io/
-- **LiveKit Deployment**: https://docs.livekit.io/deploy/
-- **WebRTC Best Practices**: https://webrtc.org/getting-started/
+
+- **LiveKit**: <https://docs.livekit.io/>
+- **LiveKit Deployment**: <https://docs.livekit.io/deploy/>
+- **WebRTC Best Practices**: <https://webrtc.org/getting-started/>
 
 ### Community Resources
-- **LiveKit Discord**: https://livekit.io/discord
-- **r/selfhosted**: https://reddit.com/r/selfhosted
-- **r/webrtc**: https://reddit.com/r/webrtc
+
+- **LiveKit Discord**: <https://livekit.io/discord>
+- **r/selfhosted**: <https://reddit.com/r/selfhosted>
+- **r/webrtc**: <https://reddit.com/r/webrtc>
 - **HackerNews**: Search for "hosting providers" discussions
 
 ### Comparison Tools
-- **Cloud Comparison**: https://cloudscore.io/
+
+- **Cloud Comparison**: <https://cloudscore.io/>
 - **Bandwidth Calculators**: Provider-specific tools
-- **WebRTC Testing**: https://test.webrtc.org/
+- **WebRTC Testing**: <https://test.webrtc.org/>
 
 ### Security Resources
-- **LetsEncrypt**: https://letsencrypt.org/docs/
-- **OWASP**: https://owasp.org/
-- **CIS Benchmarks**: https://www.cisecurity.org/cis-benchmarks/
+
+- **LetsEncrypt**: <https://letsencrypt.org/docs/>
+- **OWASP**: <https://owasp.org/>
+- **CIS Benchmarks**: <https://www.cisecurity.org/cis-benchmarks/>
 
 ---
 
