@@ -13,7 +13,7 @@ LiveKit remains a viable self-hosted option on Hetzner, but the original sizing 
 
 This refresh was checked against current upstream GitHub-hosted sources rather than the earlier research assumptions:
 
-- Latest LiveKit OSS release at review time: **v1.11.0**
+- Latest LiveKit OSS release verified on **2026-04-18**: **v1.11.0**
 - Current Linux installer: `https://get.livekit.io`
 - Current sample config still documents these important defaults:
   - `limit.num_tracks`: defaults to **400 tracks in and out per CPU**, up to 8000
