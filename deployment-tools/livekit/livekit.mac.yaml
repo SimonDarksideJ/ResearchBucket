@@ -1,0 +1,25 @@
+port: 7880
+log_level: info
+
+rtc:
+  tcp_port: 7881
+  use_external_ip: false
+  # Placeholder only; you must replace this before use.
+  # Example TEST-NET IP only; replace with the real public IP of the edge that forwards TCP traffic to this Mac.
+  node_ip: 203.0.113.10
+
+redis:
+  address: redis:6379
+
+keys:
+  your-api-key: your-api-secret
+
+prometheus_port: 6789
+
+turn:
+  enabled: true
+  domain: turn.example.com
+  tls_port: 5349
+  external_tls: false
+  cert_file: /etc/livekit/certs/fullchain.pem
+  key_file: /etc/livekit/certs/privkey.pem
