@@ -4,6 +4,7 @@ log_level: info
 rtc:
   tcp_port: 7881
   use_external_ip: false
+  # Placeholder only; you must replace this before use.
   # Example TEST-NET IP only; replace with the real public IP of the edge that forwards TCP traffic to this Mac.
   node_ip: 203.0.113.10
 
